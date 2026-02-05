@@ -1,0 +1,29 @@
+[
+    {
+        "event_id": "demo_001",
+        "home_team": "Barcelona",
+        "away_team": "Real Madrid",
+        "home_rating": 2100,
+        "away_rating": 2050,
+        "home_advantage": 100,
+        "sport": "football"
+    },
+    {
+        "event_id": "demo_002",
+        "home_team": "Manchester City",
+        "away_team": "Liverpool",
+        "home_rating": 2150,
+        "away_rating": 2080,
+        "home_advantage": 100,
+        "sport": "football"
+    },
+    {
+        "event_id": "demo_003",
+        "home_team": "Bayern Munich",
+        "away_team": "Borussia Dortmund",
+        "home_rating": 2120,
+        "away_rating": 1950,
+        "home_advantage": 100,
+        "sport": "football"
+    }
+]
