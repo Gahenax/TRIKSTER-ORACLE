@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { api } from './lib/api';
-import Home from './pages/Home';
-import Simulator from './pages/Simulator';
-import Result from './pages/Result';
 import type { SimulationResult } from './lib/types';
 import FooterDisclaimer from './components/FooterDisclaimer';
+
+// Lazy load page components for better performance (code splitting)
+const Home = lazy(() => import('./pages/Home'));
+const Simulator = lazy(() => import('./pages/Simulator'));
+const Result = lazy(() => import('./pages/Result'));
 
 type Page = 'home' | 'simulator' | 'result';
 
@@ -98,22 +100,45 @@ function App() {
 
             {/* Main Content */}
             <main style={{ flex: 1 }}>
-                {currentPage === 'home' && (
-                    <Home onNavigateSimulator={handleNavigateSimulator} />
-                )}
-                {currentPage === 'simulator' && (
-                    <Simulator
-                        onSimulate={handleSimulate}
-                        isBackendHealthy={isBackendHealthy ?? false}
-                    />
-                )}
-                {currentPage === 'result' && simulationResult && (
-                    <Result
-                        result={simulationResult}
-                        onBack={handleNavigateSimulator}
-                        onHome={handleNavigateHome}
-                    />
-                )}
+                <Suspense fallback={
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        minHeight: '400px',
+                        color: 'var(--color-text-muted)'
+                    }}>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{
+                                width: '40px',
+                                height: '40px',
+                                border: '3px solid var(--color-accent-primary)',
+                                borderTopColor: 'transparent',
+                                borderRadius: '50%',
+                                margin: '0 auto var(--space-md)',
+                                animation: 'spin 1s linear infinite'
+                            }} />
+                            <p>Loading...</p>
+                        </div>
+                    </div>
+                }>
+                    {currentPage === 'home' && (
+                        <Home onNavigateSimulator={handleNavigateSimulator} />
+                    )}
+                    {currentPage === 'simulator' && (
+                        <Simulator
+                            onSimulate={handleSimulate}
+                            isBackendHealthy={isBackendHealthy ?? false}
+                        />
+                    )}
+                    {currentPage === 'result' && simulationResult && (
+                        <Result
+                            result={simulationResult}
+                            onBack={handleNavigateSimulator}
+                            onHome={handleNavigateHome}
+                        />
+                    )}
+                </Suspense>
             </main>
 
             {/* Footer */}
