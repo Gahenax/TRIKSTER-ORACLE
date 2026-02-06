@@ -41,6 +41,9 @@ def install_error_handlers(app) -> None:
         elif status == 405:
             code = "method_not_allowed"
             msg = "Method not allowed"
+        elif status == 429:
+            code = "rate_limit_exceeded"
+            msg = "Rate limit exceeded"
         else:
             code = "http_error"
             msg = str(getattr(exc, "detail", "HTTP error"))

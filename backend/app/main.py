@@ -13,6 +13,7 @@ from app.api import system
 from app.middleware.request_id import RequestIDMiddleware
 from app.logging import configure_logging, get_logger
 from app.error_handlers import install_error_handlers
+from app.middleware.rate_limit import limiter, rate_limit_exceeded_handler
 
 # Configure structured logging
 env = os.environ.get("ENV", "development")
@@ -32,6 +33,11 @@ app = FastAPI(
 
 # Install unified error contract handlers (P0: 404/405/422)
 install_error_handlers(app)
+
+# Rate limiting (P1: Phase 2)
+from slowapi.errors import RateLimitExceeded
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
 # Add Request ID middleware (A1: Observability)
 app.add_middleware(RequestIDMiddleware)
