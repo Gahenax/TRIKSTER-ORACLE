@@ -14,6 +14,7 @@ from app.middleware.request_id import RequestIDMiddleware
 from app.logging import configure_logging, get_logger
 from app.error_handlers import install_error_handlers
 from app.middleware.rate_limit import limiter, rate_limit_exceeded_handler
+from app.middleware.idempotency import IdempotencyMiddleware
 
 # Configure structured logging
 env = os.environ.get("ENV", "development")
@@ -41,6 +42,7 @@ app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
 # Add Request ID middleware (A1: Observability)
 app.add_middleware(RequestIDMiddleware)
+app.add_middleware(IdempotencyMiddleware)  # P2: Idempotency
 
 # CORS configuration (adjust for production)
 app.add_middleware(
