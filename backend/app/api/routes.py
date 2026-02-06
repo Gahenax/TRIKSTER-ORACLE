@@ -10,8 +10,7 @@ import json
 from app.api.schemas import (
     EventInput,
     SimulationConfig,
-    SimulationResult,
-    ErrorResponse
+    SimulationResult
 )
 from app.core.engine import simulate_event
 from app.core.risk import assess_risk

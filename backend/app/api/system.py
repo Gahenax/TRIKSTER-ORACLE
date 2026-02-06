@@ -5,7 +5,6 @@ Production-grade system endpoints for monitoring and observability.
 import os
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
 
 router = APIRouter(prefix="", tags=["system"])

@@ -1,6 +1,4 @@
-import pytest
 from app.core.risk import assess_risk
-from app.api.schemas import RiskInfo
 
 def test_risk_bands():
     # 1. Low Risk (Clear favorite)

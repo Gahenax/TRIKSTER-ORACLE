@@ -2,7 +2,6 @@ import time
 import numpy as np
 import math
 from app.api.schemas import EventInput, SimulationConfig
-from app.core.model import calculate_win_probability
 
 def simulate_event(event: EventInput, config: SimulationConfig) -> dict:
     """

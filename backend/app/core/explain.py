@@ -9,7 +9,7 @@ This module transforms technical simulation outputs into narratives that:
 - Help users understand probability, risk, and uncertainty
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 from app.api.schemas import (
     ExplanationOutput,
     ScenarioInfo,
@@ -177,9 +177,9 @@ def generate_scenarios(
             name="Highly Competitive",
             probability=1.0 - max_prob,
             description=(
-                f"With no outcome exceeding 50% probability, this event is highly competitive. "
-                f"Small changes in form, tactics, or external factors could significantly "
-                f"influence the result."
+                "With no outcome exceeding 50% probability, this event is highly competitive. "
+                "Small changes in form, tactics, or external factors could significantly "
+                "influence the result."
             )
         ))
     
