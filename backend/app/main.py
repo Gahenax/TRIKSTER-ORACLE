@@ -1,11 +1,24 @@
 """
 FastAPI Main Application
 TRICKSTER-ORACLE Backend API
+
+Maturation: A1 (Request ID + Logging) + A2 (System Routes)
 """
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app import __version__
 from app.api import routes
+from app.api import system
+from app.middleware.request_id import RequestIDMiddleware
+from app.logging import configure_logging, get_logger
+
+# Configure structured logging
+env = os.environ.get("ENV", "development")
+use_json_logging = env in ["production", "staging"]
+configure_logging(level=os.environ.get("LOG_LEVEL", "INFO"), use_json=use_json_logging)
+
+logger = get_logger(__name__)
 
 # Create FastAPI app
 app = FastAPI(
@@ -16,39 +29,21 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+# Add Request ID middleware (A1: Observability)
+app.add_middleware(RequestIDMiddleware)
+
 # CORS configuration (adjust for production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TODO: Restrict in production
+    allow_origins=["*"],  # TODO: Restrict in production (E1)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include API routes
-app.include_router(routes.router)
-
-
-@app.get("/health")
-async def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "service": "trickster-oracle-api",
-        "version": __version__
-    }
-
-
-@app.get("/version")
-async def get_version():
-    """Get API version and configuration"""
-    return {
-        "version": __version__,
-        "api_name": "Trickster Oracle",
-        "mode": "demo",
-        "max_simulations_demo": 1000,
-        "disclaimer": "Educational analytics platform. Not for gambling predictions."
-    }
+# Include routers
+app.include_router(system.router)  # A2: System routes (health, ready, version)
+app.include_router(routes.router)  # Existing API routes
 
 
 @app.get("/")
@@ -58,8 +53,24 @@ async def root():
         "message": "Trickster Oracle API",
         "version": __version__,
         "docs": "/docs",
-        "health": "/health"
+        "health": "/health",
+        "ready": "/ready"
     }
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Application startup event"""
+    logger.info(
+        "Trickster Oracle API starting",
+        extra={"version": __version__, "environment": env}
+    )
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Application shutdown event"""
+    logger.info("Trickster Oracle API shutting down")
 
 
 if __name__ == "__main__":
