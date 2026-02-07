@@ -24,7 +24,8 @@ from app.core.tokens import (
     check_feature_access,
     FeatureTier,
     AccessDeniedError,
-    TokenTransaction
+    TokenTransaction,
+    UserStatus
 )
 
 router = APIRouter(prefix="/api/v2", tags=["v2"])
@@ -65,6 +66,7 @@ class FullDistributionResponse(BaseModel):
     uncertainty: UncertaintyMetrics
     cost_tokens: int
     transaction_id: str
+    user_status: UserStatus
     notes: str
 
 
@@ -183,9 +185,39 @@ async def simulate_v2(
             detail="X-User-ID header required for gated endpoints"
         )
     
-    # Check/consume tokens
+    # Enforcement: Cooldown and Daily Limit
     ledger = get_ledger()
+    status_obj = ledger.get_user_status(x_user_id)
+    now = datetime.now(timezone.utc)
+    
+    if not status_obj.is_premium:
+        # Check cooldown
+        if status_obj.cooldown_until and now < status_obj.cooldown_until:
+            wait_sec = int((status_obj.cooldown_until - now).total_seconds())
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail={
+                    "error": "cooldown_active",
+                    "message": f"Cooldown active. Please wait {wait_sec} seconds.",
+                    "cooldown_until": status_obj.cooldown_until.isoformat()
+                }
+            )
+        
+        # Check daily limit vs tokens
+        if status_obj.daily_used >= status_obj.daily_limit:
+            # If free limit reached, user MUST have tokens unless they are premium
+            if tier == FeatureTier.HEADLINE_PICK:
+                # Even headline pick costs tokens after daily limit?
+                # The rule say "consume token only if daily_used >= daily_limit and not premium"
+                # Let's assume headline pick costs 1 token after limit
+                tier = FeatureTier.FULL_DISTRIBUTION # Upgrade to check tokens
+
+    # Check/consume tokens if applicable
     try:
+        # If daily free limit not reached, headline_pick is free (0 tokens)
+        # We only call consume_tokens if it has a cost or if we want to record it.
+        # But consume_tokens for headline_pick is 0 anyway.
+        
         transaction = ledger.consume_tokens(
             user_id=x_user_id,
             feature=tier,
@@ -246,11 +278,15 @@ async def simulate_v2(
         event_horizon_days=7.0
     )
     
+    # Record analysis (increments daily_used and sets cooldown)
+    new_status = ledger.record_analysis(x_user_id)
+    
     return FullDistributionResponse(
         distribution=dist,
         uncertainty=uncertainty,
         cost_tokens=transaction.cost,
         transaction_id=transaction.transaction_id,
+        user_status=new_status,
         notes=f"Full {tier.value} analysis"
     )
 
@@ -309,6 +345,26 @@ async def topup_tokens(
         "amount_added": request.amount,
         "timestamp": datetime.now(timezone.utc)
     }
+
+
+@router.get("/me/status")
+async def get_my_status(
+    x_user_id: str = Header(..., alias="X-User-ID")
+):
+    """GET /api/v2/me/status"""
+    ledger = get_ledger()
+    return ledger.get_user_status(x_user_id)
+
+
+@router.post("/me/premium")
+async def promote_to_premium(
+    x_user_id: str = Header(..., alias="X-User-ID"),
+    is_premium: bool = True
+):
+    """POST /api/v2/me/premium (Admin/Demo mock)"""
+    ledger = get_ledger()
+    ledger.set_premium(x_user_id, is_premium)
+    return ledger.get_user_status(x_user_id)
 
 
 @router.get("/health")

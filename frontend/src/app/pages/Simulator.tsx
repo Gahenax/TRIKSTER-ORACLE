@@ -2,15 +2,29 @@ import { useState } from 'react';
 import { api } from '../lib/api';
 import type { EventInput, SimulationConfig, SimulationResult, SimulationResultV2 } from '../lib/types';
 
-interface SimulatorProps {
+export interface SimulatorProps {
     onSimulate: (result: SimulationResult | SimulationResultV2, version: 'v1' | 'v2', event: EventInput) => void;
     isBackendHealthy: boolean;
+    userStatus: any;
+    userId: string;
 }
 
-export default function Simulator({ onSimulate, isBackendHealthy }: SimulatorProps) {
+export default function Simulator({ onSimulate, isBackendHealthy, userStatus, userId }: SimulatorProps) {
     const [loading, setLoading] = useState(false);
     const [engineVersion] = useState<'v1' | 'v2'>('v2');
     const [error, setError] = useState<string | null>(null);
+    const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
+
+    // Cooldown timer logic
+    useState(() => {
+        const interval = setInterval(() => {
+            if (userStatus?.cooldown_until) {
+                const remaining = Math.max(0, Math.ceil((new Date(userStatus.cooldown_until).getTime() - Date.now()) / 1000));
+                setCooldownRemaining(remaining);
+            }
+        }, 1000);
+        return () => clearInterval(interval);
+    });
 
     const [event, setEvent] = useState<EventInput>({
         home_team: 'Barcelona',
@@ -35,7 +49,7 @@ export default function Simulator({ onSimulate, isBackendHealthy }: SimulatorPro
         try {
             if (engineVersion === 'v2') {
                 const result = isBackendHealthy
-                    ? await api.simulateV2(event, config)
+                    ? await api.simulateV2(event, config, 'full_distribution', userId)
                     : await api.simulateMockV2(event, config);
                 onSimulate(result, 'v2', event);
             } else {
@@ -44,8 +58,8 @@ export default function Simulator({ onSimulate, isBackendHealthy }: SimulatorPro
                     : await api.simulateMock(event, config);
                 onSimulate(result, 'v1', event);
             }
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Simulation failed');
+        } catch (err: any) {
+            setError(err.message || 'Simulation failed');
         } finally {
             setLoading(false);
         }
@@ -60,6 +74,21 @@ export default function Simulator({ onSimulate, isBackendHealthy }: SimulatorPro
                         Configure event parameters and run a Monte Carlo simulation
                     </p>
                 </div>
+
+                {userStatus?.daily_used >= 4 && !userStatus.is_premium && (
+                    <div style={{
+                        padding: 'var(--space-md)',
+                        background: 'rgba(255, 165, 0, 0.1)',
+                        border: '1px solid rgba(255, 165, 0, 0.3)',
+                        borderRadius: 'var(--radius-md)',
+                        color: '#FFA500',
+                        marginBottom: 'var(--space-lg)',
+                        textAlign: 'center',
+                        fontSize: 'var(--font-size-sm)'
+                    }}>
+                        ⚠️ Warning: You have {userStatus.daily_limit - userStatus.daily_used} free analyses left for today.
+                    </div>
+                )}
 
                 <div className="card">
                     <div className="card-header">
@@ -198,14 +227,27 @@ export default function Simulator({ onSimulate, isBackendHealthy }: SimulatorPro
                     <div className="card-footer">
                         <button
                             onClick={handleSimulate}
-                            disabled={loading}
+                            disabled={loading || cooldownRemaining > 0}
                             className="btn btn-primary"
-                            style={{ width: '100%' }}
+                            style={{ width: '100%', position: 'relative', overflow: 'hidden' }}
                         >
                             {loading ? (
                                 <>
                                     <div className="loading-spinner" style={{ width: '20px', height: '20px' }} />
                                     Running Simulation...
+                                </>
+                            ) : cooldownRemaining > 0 ? (
+                                <>
+                                    Cooldown: {cooldownRemaining}s
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: 0,
+                                        left: 0,
+                                        height: '4px',
+                                        background: 'rgba(255,255,255,0.3)',
+                                        width: `${(cooldownRemaining / 31) * 100}%`,
+                                        transition: 'width 1s linear'
+                                    }} />
                                 </>
                             ) : (
                                 'Run Simulation'

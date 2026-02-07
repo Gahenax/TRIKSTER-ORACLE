@@ -11,6 +11,7 @@ import type {
     HealthResponse,
     VersionResponse,
     ErrorResponse,
+    UserStatus,
 } from './types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
@@ -31,6 +32,27 @@ class TricksterAPI {
         const response = await fetch(`${API_BASE_URL}/version`);
         if (!response.ok) {
             throw new Error('Failed to fetch API version');
+        }
+        return response.json();
+    }
+
+    async getUserStatus(userId: string): Promise<UserStatus> {
+        const response = await fetch(`${API_BASE_URL}/v2/me/status`, {
+            headers: {
+                'X-User-ID': userId
+            }
+        });
+        if (!response.ok) {
+            // Mock default status if server fails or not found
+            return {
+                user_id: userId,
+                daily_used: 0,
+                daily_limit: 5,
+                cooldown_until: null,
+                token_balance: 0,
+                is_premium: false,
+                last_reset: new Date().toISOString()
+            };
         }
         return response.json();
     }
@@ -59,12 +81,19 @@ class TricksterAPI {
         });
 
         if (!response.ok) {
+            const error = await response.json();
+
             // Handle 402 Payment Required for tokens
             if (response.status === 402) {
-                throw new Error('Insufficient tokens for this analysis depth.');
+                throw new Error(error.detail?.message || 'Insufficient tokens for this analysis depth.');
             }
-            const error: ErrorResponse = await response.json();
-            throw new Error(error.message || 'Simulation v2 failed');
+
+            // Handle 429 Too Many Requests for cooldown
+            if (response.status === 429) {
+                throw new Error(error.detail?.message || 'Cooldown active. Please wait.');
+            }
+
+            throw new Error(error.message || error.detail?.message || 'Simulation v2 failed');
         }
 
         return response.json();
@@ -245,7 +274,16 @@ class TricksterAPI {
             },
             cost_tokens: 2,
             transaction_id: `tx_${Math.random().toString(36).substr(2, 9)}`,
-            notes: 'Successfully generated with V2 engine'
+            notes: 'Successfully generated with V2 engine',
+            user_status: {
+                user_id: 'demo_user',
+                daily_used: 1,
+                daily_limit: 5,
+                cooldown_until: new Date(Date.now() + 31000).toISOString(),
+                token_balance: 10,
+                is_premium: false,
+                last_reset: new Date().toISOString()
+            }
         };
     }
 }

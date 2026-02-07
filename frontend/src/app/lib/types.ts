@@ -67,12 +67,23 @@ export interface DistributionObjectV2 {
     uncertainty: UncertaintyMetrics;
 }
 
+export interface UserStatus {
+    user_id: string;
+    daily_used: number;
+    daily_limit: number;
+    cooldown_until: string | null;
+    token_balance: number;
+    is_premium: boolean;
+    last_reset: string;
+}
+
 // Result Wrapper for UI
 export interface SimulationResultV2 {
     distribution: DistributionObjectV2;
     uncertainty: UncertaintyMetrics;
     cost_tokens: number;
     transaction_id: string;
+    user_status: UserStatus;
     notes: string;
 }
 

@@ -8,6 +8,7 @@ const Home = lazy(() => import('./pages/Home'));
 const Simulator = lazy(() => import('./pages/Simulator'));
 const Result = lazy(() => import('./pages/Result'));
 const ResultV2 = lazy(() => import('./pages/ResultV2'));
+const Pricing = lazy(() => import('./pages/Pricing'));
 
 type Page = 'home' | 'simulator' | 'result';
 
@@ -17,18 +18,28 @@ function App() {
     const [simulationResult, setSimulationResult] = useState<SimulationResult | SimulationResultV2 | null>(null);
     const [lastEvent, setLastEvent] = useState<EventInput | null>(null);
     const [isBackendHealthy, setIsBackendHealthy] = useState<boolean | null>(null);
+    const [userStatus, setUserStatus] = useState<any>(null); // Simplified for now
+    const [userId] = useState<string>(`user_${Math.random().toString(36).substr(2, 9)}`);
 
     useEffect(() => {
         // Check backend health on mount
         api.checkHealth()
             .then(() => setIsBackendHealthy(true))
             .catch(() => setIsBackendHealthy(false));
-    }, []);
+
+        // Fetch user status
+        api.getUserStatus(userId).then(setUserStatus);
+    }, [userId]);
 
     const handleSimulate = (result: SimulationResult | SimulationResultV2, version: 'v1' | 'v2', event: EventInput) => {
         setSimulationResult(result);
         setEngineVersion(version);
         setLastEvent(event);
+
+        if (version === 'v2') {
+            setUserStatus((result as SimulationResultV2).user_status);
+        }
+
         setCurrentPage('result');
     };
 
@@ -39,6 +50,10 @@ function App() {
 
     const handleNavigateSimulator = () => {
         setCurrentPage('simulator');
+    };
+
+    const handleNavigatePricing = () => {
+        setCurrentPage('pricing' as any);
     };
 
     return (
@@ -66,6 +81,17 @@ function App() {
                         </div>
 
                         <nav style={{ display: 'flex', gap: 'var(--space-lg)' }}>
+                            <button
+                                onClick={handleNavigatePricing}
+                                className="btn btn-secondary btn-sm"
+                                style={{
+                                    background: 'rgba(255, 215, 0, 0.1)',
+                                    color: '#FFD700',
+                                    border: '1px solid rgba(255, 215, 0, 0.3)'
+                                }}
+                            >
+                                Get Premium
+                            </button>
                             <button
                                 onClick={handleNavigateHome}
                                 className="btn btn-secondary btn-sm"
@@ -98,6 +124,14 @@ function App() {
                                 background: isBackendHealthy ? 'var(--color-accent-success)' : 'var(--color-accent-warning)'
                             }} />
                             {isBackendHealthy ? 'Backend Connected' : 'Backend Offline (Using Mock Data)'}
+
+                            {userStatus && (
+                                <span style={{ marginLeft: 'auto', display: 'flex', gap: 'var(--space-md)' }}>
+                                    <span>Tokens: <strong>{userStatus.token_balance}</strong></span>
+                                    <span>Daily: <strong>{userStatus.daily_used} / {userStatus.daily_limit}</strong></span>
+                                    {userStatus.is_premium && <span className="badge badge-premium">PREMIUM</span>}
+                                </span>
+                            )}
                         </div>
                     )}
                 </div>
@@ -134,6 +168,16 @@ function App() {
                         <Simulator
                             onSimulate={handleSimulate}
                             isBackendHealthy={isBackendHealthy ?? false}
+                            userStatus={userStatus}
+                            userId={userId}
+                        />
+                    )}
+                    {(currentPage as string) === 'pricing' && (
+                        <Pricing
+                            userStatus={userStatus}
+                            onBack={handleNavigateSimulator}
+                            userId={userId}
+                            onUpdateStatus={setUserStatus}
                         />
                     )}
                     {currentPage === 'result' && simulationResult && (

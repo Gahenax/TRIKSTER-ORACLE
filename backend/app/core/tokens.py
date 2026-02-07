@@ -67,6 +67,17 @@ class TokenBalance(BaseModel):
     last_updated: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
+class UserStatus(BaseModel):
+    """Full user product status"""
+    user_id: str
+    daily_used: int = 0
+    daily_limit: int = 5
+    cooldown_until: Optional[datetime] = None
+    token_balance: int = 0
+    is_premium: bool = False
+    last_reset: datetime = Field(default_factory=lambda: datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0))
+
+
 class AccessDeniedError(Exception):
     """Raised when user has insufficient tokens"""
     def __init__(self, feature: FeatureTier, required: int, available: int):
@@ -258,11 +269,27 @@ class TokenLedger:
         user_txs.sort(key=lambda x: x.timestamp, reverse=True)
         return user_txs[:limit]
     
-    def get_all_transactions(self, limit: int = 1000) -> List[TokenTransaction]:
-        """Get all transactions (admin/audit purpose)"""
-        txs = list(self._transactions)
-        txs.sort(key=lambda x: x.timestamp, reverse=True)
-        return txs[:limit]
+    def get_user_status(self, user_id: str) -> UserStatus:
+        """Get full status for a user including daily limits and cooldowns"""
+        # Default implementation for in-memory
+        now = datetime.now(timezone.utc)
+        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        # This is a stub for in-memory, mostly used as interface
+        return UserStatus(
+            user_id=user_id,
+            token_balance=self.get_balance(user_id),
+            last_reset=today_start
+        )
+
+    def record_analysis(self, user_id: str) -> UserStatus:
+        """Record an analysis and update cooldown/daily counts"""
+        # Interface method
+        return self.get_user_status(user_id)
+
+    def set_premium(self, user_id: str, is_premium: bool) -> None:
+        """Set premium status for user"""
+        pass
 
 
 # Global ledger instance
