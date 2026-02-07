@@ -1,3 +1,4 @@
+from __future__ import annotations
 import json
 import logging
 from typing import Dict, Optional, List
@@ -28,7 +29,7 @@ class RedisTokenLedger(TokenLedger):
             self.client.ping()
             self.use_redis = True
             logger.info(f"Connected to Redis for TokenLedger at {host}:{port}")
-        except redis.ConnectionError:
+        except (redis.ConnectionError, redis.TimeoutError):
             self.use_redis = False
             logger.warning("Could not connect to Redis. Falling back to in-memory TokenLedger.")
 

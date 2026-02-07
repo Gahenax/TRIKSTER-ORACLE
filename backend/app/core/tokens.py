@@ -21,7 +21,7 @@ Features:
 """
 
 from typing import Dict, Optional, List
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pydantic import BaseModel, Field
 from enum import Enum
 import uuid
@@ -100,6 +100,7 @@ class TokenLedger:
         self._balances: Dict[str, int] = {}  # user_id -> balance
         self._transactions: List[TokenTransaction] = []
         self._idempotency_cache: Dict[str, str] = {}  # idempotency_key -> transaction_id
+        self._user_statuses: Dict[str, UserStatus] = {}
     
     def get_balance(self, user_id: str) -> int:
         """Get current token balance for user"""
@@ -271,25 +272,45 @@ class TokenLedger:
     
     def get_user_status(self, user_id: str) -> UserStatus:
         """Get full status for a user including daily limits and cooldowns"""
-        # Default implementation for in-memory
         now = datetime.now(timezone.utc)
         today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         
-        # This is a stub for in-memory, mostly used as interface
-        return UserStatus(
-            user_id=user_id,
-            token_balance=self.get_balance(user_id),
-            last_reset=today_start
-        )
+        status = self._user_statuses.get(user_id)
+        if not status:
+            status = UserStatus(
+                user_id=user_id,
+                token_balance=self.get_balance(user_id),
+                last_reset=today_start
+            )
+            self._user_statuses[user_id] = status
+            return status
+
+        # Daily reset check
+        if status.last_reset < today_start:
+            status.daily_used = 0
+            status.last_reset = today_start
+
+        status.token_balance = self.get_balance(user_id)
+        return status
 
     def record_analysis(self, user_id: str) -> UserStatus:
         """Record an analysis and update cooldown/daily counts"""
-        # Interface method
-        return self.get_user_status(user_id)
+        status = self.get_user_status(user_id)
+        
+        if not status.is_premium:
+            if status.daily_used < status.daily_limit:
+                status.daily_used += 1
+            
+            # Cooldown
+            from datetime import timedelta
+            status.cooldown_until = datetime.now(timezone.utc) + timedelta(seconds=31)
+            
+        return status
 
     def set_premium(self, user_id: str, is_premium: bool) -> None:
         """Set premium status for user"""
-        pass
+        status = self.get_user_status(user_id)
+        status.is_premium = is_premium
 
 
 # Global ledger instance

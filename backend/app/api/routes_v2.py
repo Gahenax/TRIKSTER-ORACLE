@@ -57,6 +57,7 @@ class HeadlinePickResponse(BaseModel):
     model_version: str = "v2.0"
     pick: Dict[str, Any]
     cost_tokens: int = 0
+    user_status: Optional[UserStatus] = None
     notes: str = "Headline pick is always free for educational access"
 
 
@@ -144,6 +145,7 @@ async def simulate_v2(
         )
     
     tier = DEPTH_TO_TIER[depth]
+    ledger = get_ledger()
     
     # FREE TIER (no auth required)
     if tier == FeatureTier.HEADLINE_PICK:
@@ -167,6 +169,11 @@ async def simulate_v2(
         confidence = "high" if dist.stdev < 0.1 else "moderate" if dist.stdev < 0.2 else "low"
         outcome = "home" if dist.percentiles.p50 > 0.55 else "away" if dist.percentiles.p50 < 0.45 else "draw"
         
+        # Record analysis if user_id is provided
+        new_status = None
+        if x_user_id:
+            new_status = ledger.record_analysis(x_user_id)
+        
         return HeadlinePickResponse(
             sport=request.sport,
             event_id=request.event_id,
@@ -175,7 +182,8 @@ async def simulate_v2(
                 "predicted_outcome": outcome,
                 "confidence": confidence,
                 "median_probability": round(dist.percentiles.p50, 3)
-            }
+            },
+            user_status=new_status
         )
     
     # GATED TIER (requires auth + tokens)
@@ -186,7 +194,6 @@ async def simulate_v2(
         )
     
     # Enforcement: Cooldown and Daily Limit
-    ledger = get_ledger()
     status_obj = ledger.get_user_status(x_user_id)
     now = datetime.now(timezone.utc)
     
