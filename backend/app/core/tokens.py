@@ -22,71 +22,7 @@ Features:
 
 from typing import Dict, Optional, List
 from datetime import datetime, timezone, timedelta
-from pydantic import BaseModel, Field
-from enum import Enum
-import uuid
-
-
-class FeatureTier(str, Enum):
-    """Analytics feature access tiers"""
-    HEADLINE_PICK = "headline_pick"
-    FULL_DISTRIBUTION = "full_distribution"
-    SCENARIO_EXTREMES = "scenario_extremes"
-    COMPARATIVE_ANALYSIS = "comparative_analysis"
-    DEEP_DIVE_EDUCATIONAL = "deep_dive_educational"
-
-
-# Token cost configuration
-FEATURE_COSTS: Dict[FeatureTier, int] = {
-    FeatureTier.HEADLINE_PICK: 0,
-    FeatureTier.FULL_DISTRIBUTION: 2,
-    FeatureTier.SCENARIO_EXTREMES: 3,
-    FeatureTier.COMPARATIVE_ANALYSIS: 3,
-    FeatureTier.DEEP_DIVE_EDUCATIONAL: 5,
-}
-
-
-class TokenTransaction(BaseModel):
-    """Record of a token transaction"""
-    transaction_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str
-    feature: FeatureTier
-    cost: int
-    balance_before: int
-    balance_after: int
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    event_id: Optional[str] = None
-    idempotency_key: Optional[str] = None
-    status: str = Field(default="success")  # success | denied | refunded
-
-
-class TokenBalance(BaseModel):
-    """User token balance"""
-    user_id: str
-    balance: int = Field(ge=0)
-    last_updated: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-
-class UserStatus(BaseModel):
-    """Full user product status"""
-    user_id: str
-    daily_used: int = 0
-    daily_limit: int = 5
-    cooldown_until: Optional[datetime] = None
-    token_balance: int = 0
-    is_premium: bool = False
-    last_reset: datetime = Field(default_factory=lambda: datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0))
-
-
-class AccessDeniedError(Exception):
-    """Raised when user has insufficient tokens"""
-    def __init__(self, feature: FeatureTier, required: int, available: int):
-        self.feature = feature
-        self.required = required
-        self.available = available
-        super().__init__(
-            f"Insufficient tokens for {feature.value}: required={required}, available={available}"
-        )
+from app.core.token_types import FeatureTier, TokenTransaction, UserStatus, AccessDeniedError, FEATURE_COSTS
 
 
 class TokenLedger:
@@ -270,6 +206,10 @@ class TokenLedger:
         user_txs.sort(key=lambda x: x.timestamp, reverse=True)
         return user_txs[:limit]
     
+    def get_all_transactions(self) -> List[TokenTransaction]:
+        """Get all transactions in the ledger (Admin/Audit)"""
+        return self._transactions
+    
     def get_user_status(self, user_id: str) -> UserStatus:
         """Get full status for a user including daily limits and cooldowns"""
         now = datetime.now(timezone.utc)
@@ -302,7 +242,6 @@ class TokenLedger:
                 status.daily_used += 1
             
             # Cooldown
-            from datetime import timedelta
             status.cooldown_until = datetime.now(timezone.utc) + timedelta(seconds=31)
             
         return status
@@ -313,20 +252,27 @@ class TokenLedger:
         status.is_premium = is_premium
 
 
-# Global ledger instance
-# Production: Uses Redis with in-memory fallback
-import os
-from app.core.redis_ledger import RedisTokenLedger
-
-_global_ledger = RedisTokenLedger(
-    host=os.getenv("REDIS_HOST", "localhost"),
-    port=int(os.getenv("REDIS_PORT", 6379)),
-    password=os.getenv("REDIS_PASSWORD")
-)
+# Lazy-loaded global ledger instance
+_global_ledger = None
 
 
 def get_ledger() -> TokenLedger:
-    """Get the global token ledger instance"""
+    """Get the global token ledger instance (Lazy initialization avoids circular imports)"""
+    global _global_ledger
+    if _global_ledger is None:
+        import os
+        try:
+            from app.core.redis_ledger import RedisTokenLedger
+            _global_ledger = RedisTokenLedger(
+                host=os.getenv("REDIS_HOST", "localhost"),
+                port=int(os.getenv("REDIS_PORT", 6379)),
+                password=os.getenv("REDIS_PASSWORD"),
+                url=os.getenv("REDIS_URL")
+            )
+        except ImportError:
+            # Fallback for systems without redis installed or other issues
+            _global_ledger = TokenLedger()
+            
     return _global_ledger
 
 
@@ -350,8 +296,7 @@ def require_tokens(
     Raises:
         AccessDeniedError: If insufficient tokens
     """
-    ledger = get_ledger()
-    return ledger.consume_tokens(user_id, feature, event_id, idempotency_key)
+    return get_ledger().consume_tokens(user_id, feature, event_id, idempotency_key)
 
 
 def check_feature_access(user_id: str, feature: FeatureTier) -> bool:
@@ -360,5 +305,4 @@ def check_feature_access(user_id: str, feature: FeatureTier) -> bool:
     
     Useful for UI to show/hide features based on balance.
     """
-    ledger = get_ledger()
-    return ledger.check_access(user_id, feature)
+    return get_ledger().check_access(user_id, feature)

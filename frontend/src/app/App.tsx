@@ -5,15 +5,16 @@ import FooterDisclaimer from './components/FooterDisclaimer';
 
 // Lazy load page components for better performance (code splitting)
 const Home = lazy(() => import('./pages/Home'));
+const Boarding = lazy(() => import('./pages/Boarding'));
 const Simulator = lazy(() => import('./pages/Simulator'));
 const Result = lazy(() => import('./pages/Result'));
 const ResultV2 = lazy(() => import('./pages/ResultV2'));
 const Pricing = lazy(() => import('./pages/Pricing'));
 
-type Page = 'home' | 'simulator' | 'result';
+type Page = 'home' | 'boarding' | 'simulator' | 'result';
 
 function App() {
-    const [currentPage, setCurrentPage] = useState<Page>('home');
+    const [currentPage, setCurrentPage] = useState<Page>('boarding');
     const [engineVersion, setEngineVersion] = useState<'v1' | 'v2'>('v1');
     const [simulationResult, setSimulationResult] = useState<SimulationResult | SimulationResultV2 | null>(null);
     const [lastEvent, setLastEvent] = useState<EventInput | null>(null);
@@ -58,84 +59,86 @@ function App() {
 
     return (
         <div className="app">
-            {/* Header */}
-            <header className=" header" style={{
-                background: 'var(--color-bg-glass)',
-                backdropFilter: 'blur(20px)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                position: 'sticky',
-                top: 0,
-                zIndex: 'var(--z-sticky)',
-                padding: 'var(--space-lg) 0'
-            }}>
-                <div className="container">
-                    <div className="flex items-center justify-between">
-                        <div
-                            onClick={handleNavigateHome}
-                            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}
-                        >
-                            <h1 className="text-gradient" style={{ margin: 0, fontSize: 'var(--font-size-2xl)' }}>
-                                Trickster Oracle
-                            </h1>
-                            <span className="badge badge-demo">Demo</span>
-                        </div>
-
-                        <nav style={{ display: 'flex', gap: 'var(--space-lg)' }}>
-                            <button
-                                onClick={handleNavigatePricing}
-                                className="btn btn-secondary btn-sm"
-                                style={{
-                                    background: 'rgba(255, 215, 0, 0.1)',
-                                    color: '#FFD700',
-                                    border: '1px solid rgba(255, 215, 0, 0.3)'
-                                }}
-                            >
-                                Get Premium
-                            </button>
-                            <button
+            {/* Header - Hidden on boarding page for clean entry */}
+            {currentPage !== 'boarding' && (
+                <header className=" header" style={{
+                    background: 'var(--color-bg-glass)',
+                    backdropFilter: 'blur(20px)',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 'var(--z-sticky)',
+                    padding: 'var(--space-lg) 0'
+                }}>
+                    <div className="container">
+                        <div className="flex items-center justify-between">
+                            <div
                                 onClick={handleNavigateHome}
-                                className="btn btn-secondary btn-sm"
+                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}
                             >
-                                Home
-                            </button>
-                            <button
-                                onClick={handleNavigateSimulator}
-                                className="btn btn-primary btn-sm"
-                            >
-                                Simulator
-                            </button>
-                        </nav>
-                    </div>
+                                <h1 className="text-gradient" style={{ margin: 0, fontSize: 'var(--font-size-2xl)' }}>
+                                    Trickster Oracle
+                                </h1>
+                                <span className="badge badge-demo">Demo</span>
+                            </div>
 
-                    {/* Backend Status Indicator */}
-                    {isBackendHealthy !== null && (
-                        <div style={{
-                            marginTop: 'var(--space-sm)',
-                            fontSize: 'var(--font-size-xs)',
-                            color: 'var(--color-text-muted)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 'var(--space-sm)'
-                        }}>
-                            <div style={{
-                                width: '8px',
-                                height: '8px',
-                                borderRadius: '50%',
-                                background: isBackendHealthy ? 'var(--color-accent-success)' : 'var(--color-accent-warning)'
-                            }} />
-                            {isBackendHealthy ? 'Backend Connected' : 'Backend Offline (Using Mock Data)'}
-
-                            {userStatus && (
-                                <span style={{ marginLeft: 'auto', display: 'flex', gap: 'var(--space-md)' }}>
-                                    <span>Tokens: <strong>{userStatus.token_balance}</strong></span>
-                                    <span>Daily: <strong>{userStatus.daily_used} / {userStatus.daily_limit}</strong></span>
-                                    {userStatus.is_premium && <span className="badge badge-premium">PREMIUM</span>}
-                                </span>
-                            )}
+                            <nav style={{ display: 'flex', gap: 'var(--space-lg)' }}>
+                                <button
+                                    onClick={handleNavigatePricing}
+                                    className="btn btn-secondary btn-sm"
+                                    style={{
+                                        background: 'rgba(255, 215, 0, 0.1)',
+                                        color: '#FFD700',
+                                        border: '1px solid rgba(255, 215, 0, 0.3)'
+                                    }}
+                                >
+                                    Get Premium
+                                </button>
+                                <button
+                                    onClick={handleNavigateHome}
+                                    className="btn btn-secondary btn-sm"
+                                >
+                                    Home
+                                </button>
+                                <button
+                                    onClick={handleNavigateSimulator}
+                                    className="btn btn-primary btn-sm"
+                                >
+                                    Simulator
+                                </button>
+                            </nav>
                         </div>
-                    )}
-                </div>
-            </header>
+
+                        {/* Backend Status Indicator */}
+                        {isBackendHealthy !== null && (
+                            <div style={{
+                                marginTop: 'var(--space-sm)',
+                                fontSize: 'var(--font-size-xs)',
+                                color: 'var(--color-text-muted)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 'var(--space-sm)'
+                            }}>
+                                <div style={{
+                                    width: '8px',
+                                    height: '8px',
+                                    borderRadius: '50%',
+                                    background: isBackendHealthy ? 'var(--color-accent-success)' : 'var(--color-accent-warning)'
+                                }} />
+                                {isBackendHealthy ? 'Backend Connected' : 'Backend Offline (Using Mock Data)'}
+
+                                {userStatus && (
+                                    <span style={{ marginLeft: 'auto', display: 'flex', gap: 'var(--space-md)' }}>
+                                        <span>Tokens: <strong>{userStatus.token_balance}</strong></span>
+                                        <span>Daily: <strong>{userStatus.daily_used} / {userStatus.daily_limit}</strong></span>
+                                        {userStatus.is_premium && <span className="badge badge-premium">PREMIUM</span>}
+                                    </span>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </header>
+            )}
 
             {/* Main Content */}
             <main style={{ flex: 1 }}>
@@ -161,6 +164,12 @@ function App() {
                         </div>
                     </div>
                 }>
+                    {currentPage === 'boarding' && (
+                        <Boarding
+                            onStart={handleNavigateSimulator}
+                            userId={userId}
+                        />
+                    )}
                     {currentPage === 'home' && (
                         <Home onNavigateSimulator={handleNavigateSimulator} />
                     )}

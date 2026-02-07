@@ -130,6 +130,8 @@ def main() -> int:
         "sport": SPORT,
         "event_id": EVENT_ID,
         "market": MARKET,
+        "home_rating": 2100.0,
+        "away_rating": 2050.0,
         "depth": "headline_pick"
     }
     try:
@@ -156,6 +158,8 @@ def main() -> int:
         "sport": SPORT,
         "event_id": EVENT_ID,
         "market": MARKET,
+        "home_rating": 2100.0,
+        "away_rating": 2050.0,
         "depth": "full_distribution",
         "config": {"n_simulations": 1000}
     }

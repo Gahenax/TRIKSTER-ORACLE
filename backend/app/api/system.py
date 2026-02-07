@@ -5,7 +5,7 @@ Production-grade system endpoints for monitoring and observability.
 import os
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timezone
 
 router = APIRouter(prefix="", tags=["system"])
 
@@ -32,6 +32,7 @@ class VersionResponse(BaseModel):
     api_name: str
     mode: str
     environment: str
+    disclaimer: str
     timestamp: str
 
 
@@ -47,7 +48,7 @@ async def health_check(request: Request):
         status="healthy",
         service="trickster-oracle-api",
         version=__version__,
-        timestamp=datetime.utcnow().isoformat() + "Z"
+        timestamp=datetime.now(timezone.utc).isoformat()
     )
 
 
@@ -70,7 +71,7 @@ async def readiness_check(request: Request):
     return ReadyResponse(
         ready=ready,
         checks=checks,
-        timestamp=datetime.utcnow().isoformat() + "Z"
+        timestamp=datetime.now(timezone.utc).isoformat()
     )
 
 
@@ -91,5 +92,6 @@ async def get_version(request: Request):
         api_name="Trickster Oracle",
         mode="demo",
         environment=environment,
+        disclaimer="Educational use only. Not for gambling purposes.",
         timestamp=datetime.utcnow().isoformat() + "Z"
     )

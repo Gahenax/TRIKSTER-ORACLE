@@ -1,11 +1,19 @@
 services:
-  # Backend API
   - type: web
     name: trickster-oracle-api
     env: python
-    buildCommand: pip install -e ./backend
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
+      - key: ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: PYTHON_VERSION
+        value: 3.11.5
+
       - key: REDIS_HOST
         fromService:
           type: redis
@@ -21,22 +29,17 @@ services:
           type: redis
           name: trickster-redis
           property: password
-      - key: PYTHON_VERSION
-        value: 3.11.5
 
-  # Redis Instance
   - type: redis
     name: trickster-redis
-    ipAllowList:
+    ipAllowList: []
 
-  # Frontend Static Site
   - type: static
     name: trickster-oracle-frontend
     env: static
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    publishDir: dist
+    rootDir: .
+    buildCommand: npm ci --prefix frontend && npm run build --prefix frontend
+    publishDir: frontend/dist
     envVars:
       - key: VITE_API_URL
         value: https://trickster-oracle-api.onrender.com
-

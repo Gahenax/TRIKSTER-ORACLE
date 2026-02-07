@@ -82,7 +82,8 @@ async def simulate(
         cached_result = _get_from_cache(cache_key)
         
         if cached_result:
-            return SimulationResult(**cached_result, cache_hit=True)
+            cached_result["cache_hit"] = True
+            return SimulationResult(**cached_result)
         
         # Run simulation
         sim_result = simulate_event(event, config)
@@ -98,16 +99,20 @@ async def simulate(
             confidence_intervals=sim_result["confidence_intervals"]
         )
         
+        # Prepare context for explanation
+        v1_sim_data = {
+            "prob_home": sim_result["prob_home"],
+            "prob_draw": sim_result["prob_draw"],
+            "prob_away": sim_result["prob_away"],
+            "risk": risk_info,
+            "confidence_intervals": sim_result["confidence_intervals"],
+            "config": config.model_dump()
+        }
+        
         # Generate explanation
         explanation = explain(
-            probabilities={
-                "home": sim_result["prob_home"],
-                "draw": sim_result["prob_draw"],
-                "away": sim_result["prob_away"]
-            },
-            event=event,
-            risk=risk_info,
-            config=config
+            simulation_result=v1_sim_data,
+            event_context=event.model_dump()
         )
         
         # Construct complete result
@@ -138,16 +143,6 @@ async def simulate(
                 "error": "ValidationError",
                 "message": str(e),
                 "details": {"field": "input_validation"}
-            }
-        )
-    except Exception as e:
-        # Log error in production
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": "SimulationError",
-                "message": "An error occurred during simulation",
-                "details": {"type": type(e).__name__}
             }
         )
 

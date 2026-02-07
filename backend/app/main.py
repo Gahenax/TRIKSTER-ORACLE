@@ -24,6 +24,18 @@ configure_logging(level=os.environ.get("LOG_LEVEL", "INFO"), use_json=use_json_l
 
 logger = get_logger(__name__)
 
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan context manager"""
+    logger.info(
+        "Trickster Oracle API starting",
+        extra={"version": __version__, "environment": env}
+    )
+    yield
+    logger.info("Trickster Oracle API shutting down")
+
 # Create FastAPI app
 app = FastAPI(
     title="Trickster Oracle API",
@@ -31,6 +43,7 @@ app = FastAPI(
     version=__version__,
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 # Install unified error contract handlers (P0: 404/405/422)
@@ -70,21 +83,6 @@ async def root():
         "health": "/health",
         "ready": "/ready"
     }
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Application startup event"""
-    logger.info(
-        "Trickster Oracle API starting",
-        extra={"version": __version__, "environment": env}
-    )
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Application shutdown event"""
-    logger.info("Trickster Oracle API shutting down")
 
 
 

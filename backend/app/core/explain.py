@@ -27,9 +27,11 @@ FORBIDDEN_TERMS = {
 }
 
 
+import re
+
 def validate_text_compliance(text: str) -> List[str]:
     """
-    Check if text contains forbidden gambling/certainty terms.
+    Check if text contains forbidden gambling/certainty terms using word boundaries.
     
     Args:
         text: Text to validate
@@ -41,7 +43,10 @@ def validate_text_compliance(text: str) -> List[str]:
     found_terms = []
     
     for term in FORBIDDEN_TERMS:
-        if term in text_lower:
+        # Use regex to find whole words only
+        # \b is a word boundary
+        pattern = rf"\b{re.escape(term.lower())}\b"
+        if re.search(pattern, text_lower):
             found_terms.append(term)
     
     return found_terms
@@ -285,7 +290,7 @@ def calculate_sensitivity(
 
 def _mock_sensitivity(base_probs: Dict, event_input: Dict) -> List[SensitivityFactor]:
     """Mock sensitivity data for testing before model.py is available."""
-    return [
+    factors = [
         SensitivityFactor(
             factor_name="Home Advantage (+50 points)",
             delta_probability=3.2,
@@ -302,6 +307,9 @@ def _mock_sensitivity(base_probs: Dict, event_input: Dict) -> List[SensitivityFa
             impact_level="LOW"
         ),
     ]
+    # Sort by absolute impact
+    factors.sort(key=lambda x: abs(x.delta_probability), reverse=True)
+    return factors
 
 
 def explain(
