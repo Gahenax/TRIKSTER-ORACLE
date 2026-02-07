@@ -1,18 +1,21 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { api } from './lib/api';
-import type { SimulationResult } from './lib/types';
+import type { SimulationResult, SimulationResultV2, EventInput } from './lib/types';
 import FooterDisclaimer from './components/FooterDisclaimer';
 
 // Lazy load page components for better performance (code splitting)
 const Home = lazy(() => import('./pages/Home'));
 const Simulator = lazy(() => import('./pages/Simulator'));
 const Result = lazy(() => import('./pages/Result'));
+const ResultV2 = lazy(() => import('./pages/ResultV2'));
 
 type Page = 'home' | 'simulator' | 'result';
 
 function App() {
     const [currentPage, setCurrentPage] = useState<Page>('home');
-    const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
+    const [engineVersion, setEngineVersion] = useState<'v1' | 'v2'>('v1');
+    const [simulationResult, setSimulationResult] = useState<SimulationResult | SimulationResultV2 | null>(null);
+    const [lastEvent, setLastEvent] = useState<EventInput | null>(null);
     const [isBackendHealthy, setIsBackendHealthy] = useState<boolean | null>(null);
 
     useEffect(() => {
@@ -22,8 +25,10 @@ function App() {
             .catch(() => setIsBackendHealthy(false));
     }, []);
 
-    const handleSimulate = (result: SimulationResult) => {
+    const handleSimulate = (result: SimulationResult | SimulationResultV2, version: 'v1' | 'v2', event: EventInput) => {
         setSimulationResult(result);
+        setEngineVersion(version);
+        setLastEvent(event);
         setCurrentPage('result');
     };
 
@@ -132,11 +137,20 @@ function App() {
                         />
                     )}
                     {currentPage === 'result' && simulationResult && (
-                        <Result
-                            result={simulationResult}
-                            onBack={handleNavigateSimulator}
-                            onHome={handleNavigateHome}
-                        />
+                        engineVersion === 'v2' ? (
+                            <ResultV2
+                                result={simulationResult as SimulationResultV2}
+                                event={lastEvent!}
+                                onBack={handleNavigateSimulator}
+                                onHome={handleNavigateHome}
+                            />
+                        ) : (
+                            <Result
+                                result={simulationResult as SimulationResult}
+                                onBack={handleNavigateSimulator}
+                                onHome={handleNavigateHome}
+                            />
+                        )
                     )}
                 </Suspense>
             </main>

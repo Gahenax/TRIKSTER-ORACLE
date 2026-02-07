@@ -265,9 +265,16 @@ class TokenLedger:
         return txs[:limit]
 
 
-# Global ledger instance (in-memory for now)
-# Production: Replace with Redis-backed implementation
-_global_ledger = TokenLedger()
+# Global ledger instance
+# Production: Uses Redis with in-memory fallback
+import os
+from app.core.redis_ledger import RedisTokenLedger
+
+_global_ledger = RedisTokenLedger(
+    host=os.getenv("REDIS_HOST", "localhost"),
+    port=int(os.getenv("REDIS_PORT", 6379)),
+    password=os.getenv("REDIS_PASSWORD")
+)
 
 
 def get_ledger() -> TokenLedger:

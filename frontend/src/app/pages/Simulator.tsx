@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { api } from '../lib/api';
-import type { EventInput, SimulationConfig, SimulationResult } from '../lib/types';
+import type { EventInput, SimulationConfig, SimulationResult, SimulationResultV2 } from '../lib/types';
 
 interface SimulatorProps {
-    onSimulate: (result: SimulationResult) => void;
+    onSimulate: (result: SimulationResult | SimulationResultV2, version: 'v1' | 'v2') => void;
     isBackendHealthy: boolean;
 }
 
 export default function Simulator({ onSimulate, isBackendHealthy }: SimulatorProps) {
     const [loading, setLoading] = useState(false);
+    const [engineVersion, setEngineVersion] = useState<'v1' | 'v2'>('v2');
     const [error, setError] = useState<string | null>(null);
 
     const [event, setEvent] = useState<EventInput>({
@@ -18,11 +19,13 @@ export default function Simulator({ onSimulate, isBackendHealthy }: SimulatorPro
         away_rating: 2050,
         home_advantage: 100,
         sport: 'football',
+        event_id: `evt_${Date.now()}`
     });
 
     const [config, setConfig] = useState<SimulationConfig>({
         n_simulations: 1000,
         seed: undefined,
+        ci_level: 0.95
     });
 
     const handleSimulate = async () => {
@@ -30,11 +33,17 @@ export default function Simulator({ onSimulate, isBackendHealthy }: SimulatorPro
         setError(null);
 
         try {
-            const result = isBackendHealthy
-                ? await api.simulate(event, config)
-                : await api.simulateMock(event, config);
-
-            onSimulate(result);
+            if (engineVersion === 'v2') {
+                const result = isBackendHealthy
+                    ? await api.simulateV2(event, config)
+                    : await api.simulateMockV2(event, config);
+                onSimulate(result, 'v2');
+            } else {
+                const result = isBackendHealthy
+                    ? await api.simulate(event, config)
+                    : await api.simulateMock(event, config);
+                onSimulate(result, 'v1');
+            }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Simulation failed');
         } finally {

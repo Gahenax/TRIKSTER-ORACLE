@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Smoke Test Script for TRICKSTER-ORACLE v2 API
 
