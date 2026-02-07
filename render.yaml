@@ -27,7 +27,11 @@ services:
   # Redis Instance
   - type: redis
     name: trickster-redis
-    ipAllowList: [] # Only allow access from Render services
+    ipAllowList:
+      - source: 74.220.48.0/24
+        description: Hostinger Range 1
+      - source: 74.220.56.0/24
+        description: Hostinger Range 2
 
   # Frontend Static Site
   - type: static
