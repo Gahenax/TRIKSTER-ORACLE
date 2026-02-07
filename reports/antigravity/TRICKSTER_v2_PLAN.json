@@ -1,0 +1,75 @@
+{
+  "milestones": [
+    "M0_BASELINE_AUDIT",
+    "M1_SIM_ENGINE_V2_DISTRIBUTIONS",
+    "M2_UNCERTAINTY_LAYER_METRICS",
+    "M3_TOKEN_GATING_ANALYTICS_ACCESS",
+    "M4_UI_PICK_V2_SKELETON",
+    "M5_TRICKSTER_LAB_MICRO_LEARNING_SCAFFOLD",
+    "M6_VERIFICATION_AND_RELEASE_NOTES"
+  ],
+  "instructions": {
+    "M0_BASELINE_AUDIT": "\n- Confirm repo opens and runs existing tests/build (no changes).\n- Identify where current simulation logic lives (search for keywords: montecarlo, simulate, simulation, odds, probabilities).\n- Record baseline commands & outputs as evidence.\n- DO NOT modify code in this milestone.\n",
+    "M1_SIM_ENGINE_V2_DISTRIBUTIONS": "\n- Implement Simulation Engine v2 output = distribution object, per SIM_ENGINE_SPEC:\n{\n  \"artifact\": \"distribution_object\",\n  \"fields_required\": [\n    \"sport\",\n    \"event_id\",\n    \"market\",\n    \"model_version\",\n    \"n_sims\",\n    \"ci_level\",\n    \"percentiles\",\n    \"mean\",\n    \"stdev\",\n    \"skew\",\n    \"kurtosis\",\n    \"scenarios\",\n    \"notes\"\n  ],\n  \"scenario_types\": [\n    \"conservative\",\n    \"base\",\n    \"aggressive\"\n  ]\n}\n- Add scenario execution: conservative/base/aggressive with explicit parameter deltas (documented).\n- Ensure outputs include percentiles P5/P25/P50/P75/P95 and CI level.\n- Add deterministic seed option for reproducible tests.\n- Add unit tests for:\n  1) schema presence\n  2) deterministic repeatability with seed\n  3) percentiles monotonicity (p5<=p25<=p50<=p75<=p95)\n- Keep changes minimal: adapt existing functions; do not rewrite architecture.\n",
+    "M2_UNCERTAINTY_LAYER_METRICS": "\n- Add uncertainty metrics:\n{\n  \"volatility_score\": \"0..100 (higher = more volatile distribution / higher variance / fat tails)\",\n  \"data_quality_index\": \"0..100 (higher = better data coverage & recency; penalize missing features)\",\n  \"confidence_decay\": \"0..1 per day or per time unit (higher = confidence decays faster)\"\n}\n- These metrics must be computed from distribution + data availability signals.\n- Add tests that:\n  - volatility_score increases when variance increases (synthetic distributions)\n  - data_quality_index decreases when key features missing\n  - confidence_decay increases with older data timestamp\n",
+    "M3_TOKEN_GATING_ANALYTICS_ACCESS": "\n- Implement token gating at API/service layer:\n{\n  \"principle\": \"tokens buy depth (analysis, scenarios, export), NOT 'winning picks'\",\n  \"tiers\": [\n    {\n      \"feature\": \"headline_pick\",\n      \"cost_tokens\": 0\n    },\n    {\n      \"feature\": \"full_distribution\",\n      \"cost_tokens\": 2\n    },\n    {\n      \"feature\": \"scenario_extremes\",\n      \"cost_tokens\": 3\n    },\n    {\n      \"feature\": \"comparative_analysis\",\n      \"cost_tokens\": 3\n    },\n    {\n      \"feature\": \"deep_dive_educational\",\n      \"cost_tokens\": 5\n    }\n  ]\n}\n- Headline remains free; deeper analysis endpoints require tokens.\n- Add clear server-side enforcement (no client-only gating).\n- Implement token ledger transactions with audit logs:\n  - who, what feature, cost, timestamp, event_id\n- Add tests for:\n  - deny when insufficient tokens\n  - allow and decrement when sufficient\n  - idempotency protection (avoid double charge on retries)\n",
+    "M4_UI_PICK_V2_SKELETON": "\n- Implement UI skeleton for \"Pick v2\":\n  - show distribution chart placeholder + percentiles table\n  - show risk zones wording (educational)\n  - no gambling-forward copy\n- Only wire to existing endpoints; if backend missing fields, render gracefully.\n- Add simple Cypress/Playwright smoke (if stack supports) or minimal DOM checks.\n",
+    "M5_TRICKSTER_LAB_MICRO_LEARNING_SCAFFOLD": "\n- Create \"Trickster Lab\" scaffolding:\n  - modules list (static JSON first)\n  - module detail page\n  - token-unlock for deep modules (reuse token gating)\n- Keep content minimal but non-empty: at least 4 modules with short explanations.\n",
+    "M6_VERIFICATION_AND_RELEASE_NOTES": "\n- Run full test suite and build.\n- Produce release notes: what changed, how to verify, rollback steps.\n- Ensure no policy-unsafe language in UI/copy.\n"
+  },
+  "specs": {
+    "sim_engine": {
+      "artifact": "distribution_object",
+      "fields_required": [
+        "sport",
+        "event_id",
+        "market",
+        "model_version",
+        "n_sims",
+        "ci_level",
+        "percentiles",
+        "mean",
+        "stdev",
+        "skew",
+        "kurtosis",
+        "scenarios",
+        "notes"
+      ],
+      "scenario_types": [
+        "conservative",
+        "base",
+        "aggressive"
+      ]
+    },
+    "uncertainty_metrics": {
+      "volatility_score": "0..100 (higher = more volatile distribution / higher variance / fat tails)",
+      "data_quality_index": "0..100 (higher = better data coverage & recency; penalize missing features)",
+      "confidence_decay": "0..1 per day or per time unit (higher = confidence decays faster)"
+    },
+    "token_gating": {
+      "principle": "tokens buy depth (analysis, scenarios, export), NOT 'winning picks'",
+      "tiers": [
+        {
+          "feature": "headline_pick",
+          "cost_tokens": 0
+        },
+        {
+          "feature": "full_distribution",
+          "cost_tokens": 2
+        },
+        {
+          "feature": "scenario_extremes",
+          "cost_tokens": 3
+        },
+        {
+          "feature": "comparative_analysis",
+          "cost_tokens": 3
+        },
+        {
+          "feature": "deep_dive_educational",
+          "cost_tokens": 5
+        }
+      ]
+    }
+  }
+}
