@@ -25,18 +25,7 @@
 git status --porcelain
 ```
 ```
- M FINAL_SESSION_SUMMARY.md
-?? antigravity_roadmap_exec.py
-?? backend/0.1.9
-?? backend/app/core/errors.py
-?? backend/app/schemas/
-?? backend/tools/verify_error_contract.py
-?? docs/DEPLOYMENT_SUCCESS_REPORT.md
-?? docs/RENDER_QUICK_START.md
-?? docs/REPORTE_ESTADO_ACTUAL_20260206.md
-?? docs/STATE_CONFIRMATION_REPORT.md
-?? tools/complete_phase3.py
-?? tools/dns_diagnostic.py
+
 ```
 - **git_head**
 
@@ -44,7 +33,7 @@ git status --porcelain
 git rev-parse HEAD
 ```
 ```
-7c465a9884fa523179dd0d59cab94afdd2b7c5b3
+527170cfc647b6d01a81d3e5373ad569989e254c
 ```
 - **repo_ls**
 

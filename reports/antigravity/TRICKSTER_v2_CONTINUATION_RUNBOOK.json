@@ -1,0 +1,120 @@
+{
+  "milestones": [
+    "B1_CONTRACT_AND_DEPLOY_GATE",
+    "M4_UI_PICK_V2",
+    "M5_TRICKSTER_LAB",
+    "M6_VERIFICATION_RELEASE"
+  ],
+  "instructions": {
+    "B1_CONTRACT_AND_DEPLOY_GATE": "\n1) Create/confirm API contract doc:\n   - Create docs/API_CONTRACT_v2.md (or similar) describing DistributionObject + uncertainty + token gating.\n   - Include sanitized example requests/responses.\n2) Implement production-safe exposure:\n   Preferred: add /api/v2 routes that call existing v2 engine (M1\u2013M3).\n   Alternative: introduce feature flags SIM_ENGINE_V2 and TOKENS_ENFORCEMENT (default off).\n3) Deploy readiness:\n   - Ensure /health /ready /version endpoints are green.\n4) Add a deterministic smoke script (scripts/smoke_v2.py or bash) that can run against a base URL:\n   - free-tier call\n   - gated endpoint without tokens -> must deny\n   - gated endpoint with tokens -> must allow and decrement exactly once\n   - retry same request with same idempotency key -> no double-charge\n   - verify audit trail log entry exists (or endpoint/DB record)\n5) Record evidence and rollback steps.\n",
+    "M4_UI_PICK_V2": "\n1) Implement Pick v2 UI view:\n   - percentiles (p5..p95) visible\n   - scenarios summary (conservative/base/aggressive)\n   - uncertainty panel (volatility/data quality/confidence decay)\n   - graceful degrade if backend returns partial data\n2) Use /api/v2 if present; else minimal adapter.\n3) No gambling-forward language. Keep educational framing.\n4) Add a minimal smoke test for UI load + render.\n",
+    "M5_TRICKSTER_LAB": "\n1) Implement Trickster Lab scaffold:\n   - modules list from static JSON\n   - module detail view\n2) Token unlock for deep modules using server-side enforcement.\n3) Minimal progress tracking (local ok). Must not break.\n4) Add basic tests (backend gating + frontend route load).\n",
+    "M6_VERIFICATION_RELEASE": "\n1) Run full tests suite(s) and build.\n2) Run E2E path:\n   UI -> /api/v2 -> token gating -> ledger -> audit trail\n3) Write release notes + verification checklist + rollback plan.\n4) Record evidence.\n"
+  },
+  "specs": {
+    "contract_v2": {
+      "distribution_object": {
+        "required_fields": [
+          "sport",
+          "event_id",
+          "market",
+          "model_version",
+          "n_sims",
+          "ci_level",
+          "percentiles",
+          "mean",
+          "stdev",
+          "scenarios",
+          "uncertainty"
+        ],
+        "percentiles": [
+          "p5",
+          "p25",
+          "p50",
+          "p75",
+          "p95"
+        ],
+        "scenarios": [
+          "conservative",
+          "base",
+          "aggressive"
+        ],
+        "uncertainty": [
+          "volatility_score",
+          "data_quality_index",
+          "confidence_decay"
+        ]
+      },
+      "token_gating": {
+        "principle": "tokens buy depth (analysis, scenarios, export), not 'winning picks'",
+        "tiers": [
+          {
+            "feature": "headline_pick",
+            "cost_tokens": 0
+          },
+          {
+            "feature": "full_distribution",
+            "cost_tokens": 2
+          },
+          {
+            "feature": "scenario_extremes",
+            "cost_tokens": 3
+          },
+          {
+            "feature": "comparative_analysis",
+            "cost_tokens": 3
+          },
+          {
+            "feature": "deep_dive_educational",
+            "cost_tokens": 5
+          }
+        ],
+        "idempotency_required": true,
+        "audit_trail_required": true
+      }
+    },
+    "deploy_gate": {
+      "preferred_strategy": "versioned_routes",
+      "option_versioned_routes": {
+        "base": "/api/v2",
+        "endpoints_min": [
+          "/simulate",
+          "/analysis",
+          "/tokens/ledger"
+        ],
+        "compat": "do not break /api/v1"
+      },
+      "option_feature_flags": {
+        "flags": [
+          "SIM_ENGINE_V2",
+          "TOKENS_ENFORCEMENT"
+        ],
+        "default": "off",
+        "rollout": "by env var or config"
+      },
+      "smoke_tests": [
+        "health_ready_version",
+        "free_tier_access",
+        "token_denial_no_balance",
+        "token_charge_once_with_idempotency_retry",
+        "audit_trail_written"
+      ]
+    },
+    "ui_m4": {
+      "pick_v2_view": [
+        "percentiles_table",
+        "scenarios_summary",
+        "uncertainty_badges_or_panel",
+        "graceful_degrade_if_missing_fields",
+        "no gambling-forward copy"
+      ],
+      "integration": "use /api/v2 if available; else adapter layer with minimal transformation"
+    },
+    "lab_m5": {
+      "modules_min": 4,
+      "format": "static JSON first",
+      "unlock": "reuse token gating server-side",
+      "progress": "minimal (local ok), but must not break"
+    }
+  }
+}
