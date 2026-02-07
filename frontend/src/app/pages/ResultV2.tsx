@@ -1,4 +1,3 @@
-import React from 'react';
 import type { SimulationResultV2, EventInput } from '../lib/types';
 import UncertaintyBadges from '../components/UncertaintyBadges';
 import DistributionChart from '../components/DistributionChart';

@@ -3,13 +3,13 @@ import { api } from '../lib/api';
 import type { EventInput, SimulationConfig, SimulationResult, SimulationResultV2 } from '../lib/types';
 
 interface SimulatorProps {
-    onSimulate: (result: SimulationResult | SimulationResultV2, version: 'v1' | 'v2') => void;
+    onSimulate: (result: SimulationResult | SimulationResultV2, version: 'v1' | 'v2', event: EventInput) => void;
     isBackendHealthy: boolean;
 }
 
 export default function Simulator({ onSimulate, isBackendHealthy }: SimulatorProps) {
     const [loading, setLoading] = useState(false);
-    const [engineVersion, setEngineVersion] = useState<'v1' | 'v2'>('v2');
+    const [engineVersion] = useState<'v1' | 'v2'>('v2');
     const [error, setError] = useState<string | null>(null);
 
     const [event, setEvent] = useState<EventInput>({
@@ -37,12 +37,12 @@ export default function Simulator({ onSimulate, isBackendHealthy }: SimulatorPro
                 const result = isBackendHealthy
                     ? await api.simulateV2(event, config)
                     : await api.simulateMockV2(event, config);
-                onSimulate(result, 'v2');
+                onSimulate(result, 'v2', event);
             } else {
                 const result = isBackendHealthy
                     ? await api.simulate(event, config)
                     : await api.simulateMock(event, config);
-                onSimulate(result, 'v1');
+                onSimulate(result, 'v1', event);
             }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Simulation failed');

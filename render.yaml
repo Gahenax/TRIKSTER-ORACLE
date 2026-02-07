@@ -28,3 +28,15 @@ services:
   - type: redis
     name: trickster-redis
     ipAllowList: [] # Only allow access from Render services
+
+  # Frontend Static Site
+  - type: static
+    name: trickster-oracle-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://trickster-oracle-api.onrender.com
+
