@@ -37,9 +37,9 @@ services:
   - type: static
     name: trickster-oracle-frontend
     env: static
-    rootDir: frontend
-    buildCommand: npm ci && npm run build
-    publishDir: dist
+    rootDir: .
+    buildCommand: npm ci --prefix frontend && npm run build --prefix frontend
+    publishDir: frontend/dist
     envVars:
       - key: VITE_API_URL
         value: https://trickster-oracle-api.onrender.com
