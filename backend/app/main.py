@@ -11,6 +11,7 @@ from app import __version__
 from app.api import routes
 from app.api import routes_v2  # B1: v2 API with token gating
 from app.api import system
+from app.api import oracle  # Oracle MVP
 from app.middleware.request_id import RequestIDMiddleware
 from app.logging import configure_logging, get_logger
 from app.error_handlers import install_error_handlers
@@ -69,6 +70,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(system.router)  # A2: System routes (health, ready, version)
+app.include_router(oracle.router)  # Oracle MVP
 app.include_router(routes.router)  # Existing v1 API routes
 app.include_router(routes_v2.router)  # B1: v2 API routes with token gating
 

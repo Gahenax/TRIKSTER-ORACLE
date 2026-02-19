@@ -1,0 +1,58 @@
+@Jules - Por favor ejecuta este work order en el proyecto Trickster Oracle.
+
+CONTEXTO:
+Estamos integrando una arquitectura de kernel en el backend de Trickster Oracle. Ya tenemos la infraestructura base completa (Fases 1-2) con todos los tests pasando (94/94). Necesito que trabajes en las Fases 3-5 mientras yo me enfoco en la integración crítica del endpoint.
+
+REPOSITORIO:
+c:\Users\USUARIO\.gemini\antigravity\playground\TRIKSTER-ORACLE\backend
+
+INSTRUCCIONES DETALLADAS:
+Lee y ejecuta el work order completo en: JULES_WORK_ORDER.md
+
+TAREAS ASIGNADAS (en orden de prioridad):
+1. History Provider para TrueSkill Through Time (Task 1)
+2. Matchup Graph Builder (Task 2) 
+3. Scenario Fixtures adicionales (Task 3)
+4. API Documentation update (Task 4)
+
+RESTRICCIONES CRÍTICAS:
+- NO modifiques archivos en app/tests/ (84 tests existentes)
+- Todos los tests existentes DEBEN seguir pasando
+- Sigue el estilo del código existente en app/core/
+- Usa type hints y docstrings
+
+TESTING DESPUÉS DE CADA TAREA:
+```bash
+cd backend
+# Test específico de tu tarea
+pytest tests/test_history_provider.py -v
+pytest tests/test_graph_builder.py -v
+
+# Regression completo
+pytest app/tests/ -q
+
+# Todos los kernel tests
+pytest tests/ -v
+```
+
+REPORTA DESPUÉS DE CADA TAREA:
+1. Archivos creados/modificados
+2. Resultados de tests (X passed)
+3. Cualquier blocker o pregunta
+4. Próxima tarea que inicias
+
+DELIVERABLES ESPERADOS:
+- backend/app/ratings/history_provider.py (NEW)
+- backend/tests/test_history_provider.py (NEW, ≥4 tests)
+- backend/app/sim_kernel/graph_builder.py (NEW)
+- backend/tests/test_graph_builder.py (NEW, ≥5 tests)
+- 4+ archivos JSON en backend/tests/scenarios/
+- backend/tests/test_scenarios_runner.py (UPDATED)
+- backend/API_DOCUMENTATION.md (UPDATED)
+
+Al finalizar todo, crea un reporte resumen con todos los cambios y confirma que:
+✅ Todos los tests existentes siguen pasando (84/84)
+✅ Todos tus nuevos tests pasan
+✅ Total de tests: ~110+
+
+¿Alguna pregunta antes de empezar?

@@ -1,0 +1,4 @@
+# file: C:\Users\USUARIO\.gemini\antigravity\playground\TRIKSTER-ORACLE\core\contract.py
+# hypothesis_version: 6.151.6
+
+[0.0, 1.0, '^(GREEN|YELLOW|RED)$']

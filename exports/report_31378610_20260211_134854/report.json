@@ -1,0 +1,31 @@
+{
+  "app_version": "1.0.0-desktop",
+  "policy_version": "1.0.0-risk-only",
+  "event_key": "3137861032e3471b38bcca05fb6cf0811fae1ec2b4926055afc8083474b6af13",
+  "snapshot_id": "snap_demo_1",
+  "seed": 42,
+  "config": {
+    "n_sims": 10000
+  },
+  "features_summary": {
+    "rating_diff": 50.0,
+    "home_advantage": 100.0,
+    "home_availability_ratio": 0.95,
+    "away_availability_ratio": 0.88
+  },
+  "results": {
+    "pls_percent": 0.3079,
+    "zone": "RED",
+    "tail_percentiles": {
+      "p5": -0.8575452046936521,
+      "p10": -0.7096899014075685,
+      "p25": -0.41808214461814686
+    },
+    "fragility": 0.26091179268126197
+  },
+  "audit": {
+    "determinism_signature": "cdcb105413a665d239722323ab23077846253a2a9936656a464a53ae3e7c0c8e",
+    "created_at_utc": "2026-02-11T13:48:54.644334Z",
+    "inputs_hashes": {}
+  }
+}

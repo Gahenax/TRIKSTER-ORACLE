@@ -1,0 +1,82 @@
+{
+    "version": "oracle.v1",
+    "request_id": "uuid",
+    "mode": "FAST|ORACLE",
+    "sport": "FOOTBALL|UFC",
+    "actors": {
+        "primary": "string",
+        "opponent": "string",
+        "alternatives": [
+            "string"
+        ]
+    },
+    "verdict": {
+        "value_detected": "boolean",
+        "value_strength": "LOW|MEDIUM|HIGH|NONE",
+        "confidence": "LOW|MEDIUM|HIGH",
+        "reason_codes": [
+            "string"
+        ]
+    },
+    "risk": {
+        "variance_level": "LOW|MEDIUM|HIGH",
+        "drawdown_level": "LOW|MEDIUM|HIGH",
+        "volatility_notes": "string"
+    },
+    "scenario": {
+        "dominant": "string",
+        "failure_conditions": [
+            "string"
+        ],
+        "sensitivity_drivers": [
+            "string"
+        ]
+    },
+    "ranking": [
+        {
+            "option": "string",
+            "profile": "BEST_BALANCE|VALUE_ONLY|RISKY|DISCARDED",
+            "notes": "string"
+        }
+    ],
+    "chart": {
+        "enabled": "boolean",
+        "type": "DENSITY|RANGE",
+        "data": {
+            "x_label": "string",
+            "y_label": "string",
+            "series": [
+                {
+                    "name": "string",
+                    "x": [
+                        "float"
+                    ],
+                    "y": [
+                        "float"
+                    ]
+                }
+            ]
+        }
+    },
+    "text": {
+        "title": "string",
+        "body_sections": [
+            {
+                "header": "string",
+                "content": "string"
+            }
+        ]
+    },
+    "audit": {
+        "samples": "int",
+        "ci_level": "float",
+        "kill_switches": [
+            "string"
+        ],
+        "timing_ms": {
+            "fetch": 0,
+            "simulate": 0,
+            "compose": 0
+        }
+    }
+}

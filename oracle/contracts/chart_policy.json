@@ -1,0 +1,3 @@
+{
+    "spec": "If verdict.value_detected == False: chart.enabled = False; UI must not render any chart container. If verdict.value_detected == True: chart.enabled = True; chart.type = DENSITY (default); Provide exactly ONE series for primary scenario distribution; Alternatives: do NOT add multiple series; encode alternatives in ranking text only."
+}

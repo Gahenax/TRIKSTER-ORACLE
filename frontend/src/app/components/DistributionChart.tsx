@@ -1,4 +1,17 @@
 import React from 'react';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Filler,
+    Tooltip,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+// Register Chart.js components once
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip);
 
 interface DistributionChartProps {
     percentiles: {
@@ -12,83 +25,93 @@ interface DistributionChartProps {
 }
 
 const DistributionChart: React.FC<DistributionChartProps> = ({ percentiles, mean }) => {
-    // Normalizing values to percentage for CSS placement
-    const toPct = (val: number) => `${Math.min(val * 100, 100)}%`;
+    // Guard: if percentiles are missing or invalid, show text-only fallback
+    if (
+        !percentiles ||
+        typeof percentiles.p5 !== 'number' ||
+        typeof percentiles.p50 !== 'number' ||
+        typeof percentiles.p95 !== 'number'
+    ) {
+        return (
+            <div style={{
+                padding: 'var(--space-xl)',
+                textAlign: 'center',
+                color: 'var(--color-text-muted)',
+                fontStyle: 'italic'
+            }}>
+                No distribution data available for this analysis.
+            </div>
+        );
+    }
+
+    // Build a bell-curve-like shape from the 5 percentile points
+    // Y values approximate relative density (higher near median)
+    const labels = ['P5', 'P25', 'P50', 'P75', 'P95'];
+    const xValues = [
+        percentiles.p5,
+        percentiles.p25,
+        percentiles.p50,
+        percentiles.p75,
+        percentiles.p95,
+    ].map((v) => (v * 100).toFixed(1) + '%');
+
+    // Approximate density: peaks at P50, tapers at extremes
+    const densityValues = [0.10, 0.55, 1.0, 0.55, 0.10];
+
+    const data = {
+        labels: labels.map((l, i) => `${l} (${xValues[i]})`),
+        datasets: [
+            {
+                data: densityValues,
+                borderColor: '#6366f1',
+                backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#6366f1',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+            },
+        ],
+    };
+
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 600 } as const,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleColor: '#fff',
+                bodyColor: '#e2e8f0',
+                borderColor: 'rgba(99, 102, 241, 0.5)',
+                borderWidth: 1,
+                callbacks: {
+                    label: (ctx: any) => {
+                        const pctValues = [percentiles.p5, percentiles.p25, percentiles.p50, percentiles.p75, percentiles.p95];
+                        return `Probability: ${(pctValues[ctx.dataIndex] * 100).toFixed(1)}%`;
+                    },
+                },
+            },
+        },
+        scales: {
+            x: {
+                grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { size: 11 } },
+            },
+            y: {
+                display: false,
+            },
+        },
+    };
 
     return (
-        <div style={{ padding: 'var(--space-xl) 0' }}>
-            <div style={{
-                height: '8px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: 'var(--radius-full)',
-                position: 'relative',
-                marginBottom: 'var(--space-2xl)'
-            }}>
-                {/* Confidence Range P5 - P95 (Outer shadow area) */}
-                <div style={{
-                    position: 'absolute',
-                    left: toPct(percentiles.p5),
-                    right: `${100 - parseFloat(toPct(percentiles.p95))}%`,
-                    height: '100%',
-                    background: 'rgba(var(--color-accent-primary-rgb), 0.1)',
-                    borderRadius: 'var(--radius-full)',
-                    border: '1px dashed rgba(255, 255, 255, 0.2)'
-                }} />
-
-                {/* Common Range P25 - P75 (Focus area) */}
-                <div style={{
-                    position: 'absolute',
-                    left: toPct(percentiles.p25),
-                    right: `${100 - parseFloat(toPct(percentiles.p75))}%`,
-                    height: '24px',
-                    top: '-8px',
-                    background: 'linear-gradient(90deg, var(--color-accent-primary), var(--color-accent-secondary))',
-                    borderRadius: 'var(--radius-md)',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <span style={{ fontSize: '10px', color: '#fff', fontWeight: 700 }}>50% CONFIDENCE</span>
-                </div>
-
-                {/* Median Indicator (P50) */}
-                <div style={{
-                    position: 'absolute',
-                    left: toPct(percentiles.p50),
-                    top: '-12px',
-                    height: '32px',
-                    width: '2px',
-                    background: '#fff',
-                    zIndex: 2,
-                    boxShadow: '0 0 10px #fff'
-                }}>
-                    <div style={{
-                        position: 'absolute',
-                        top: '-25px',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        whiteSpace: 'nowrap'
-                    }}>
-                        MEDIAN: {(percentiles.p50 * 100).toFixed(1)}%
-                    </div>
-                </div>
-
-                {/* Markers for P5 and P95 */}
-                {[percentiles.p5, percentiles.p95].map((p, i) => (
-                    <div key={i} style={{
-                        position: 'absolute',
-                        left: toPct(p),
-                        top: '12px',
-                        fontSize: '10px',
-                        color: 'var(--color-text-muted)',
-                        transform: 'translateX(-50%)'
-                    }}>
-                        P{i === 0 ? '5' : '95'}: {(p * 100).toFixed(0)}%
-                    </div>
-                ))}
+        <div style={{ padding: 'var(--space-lg) 0' }}>
+            <div style={{ height: '200px', position: 'relative' }}>
+                <Line data={data} options={options} />
             </div>
 
             <p style={{
@@ -98,7 +121,9 @@ const DistributionChart: React.FC<DistributionChartProps> = ({ percentiles, mean
                 fontStyle: 'italic',
                 marginTop: 'var(--space-md)'
             }}>
-                Mean outcome: {(mean * 100).toFixed(1)}% probability across {percentiles.p95 - percentiles.p5 > 0.4 ? 'high' : 'low'} variance spread.
+                Mean outcome: {(mean * 100).toFixed(1)}% probability — Spread:{' '}
+                {((percentiles.p95 - percentiles.p5) * 100).toFixed(1)}pp
+                ({percentiles.p95 - percentiles.p5 > 0.4 ? 'high' : percentiles.p95 - percentiles.p5 > 0.2 ? 'moderate' : 'low'} variance)
             </p>
         </div>
     );

@@ -1,0 +1,49 @@
+{
+    "project": "Trickster",
+    "kanban_state": "ACTIVE",
+    "config": {
+        "columns": [
+            "BACKLOG",
+            "READY",
+            "IN_PROGRESS",
+            "REVIEW_VALIDATION",
+            "BLOCKED",
+            "DEPLOYED",
+            "OBSERVED",
+            "DONE"
+        ],
+        "wip_limits": {
+            "IN_PROGRESS": 3,
+            "REVIEW_VALIDATION": 2
+        },
+        "taxonomies": [
+            "MODEL",
+            "BACKEND",
+            "UI_UX",
+            "MONETIZATION",
+            "COMPLIANCE_RISK",
+            "EXPERIMENT"
+        ],
+        "policies": {
+            "ready": [
+                "single_sentence_objective",
+                "measurable_success_criteria",
+                "kill_criteria",
+                "expected_impact"
+            ],
+            "done": [
+                "integrated_or_released",
+                "no_p0_errors",
+                "metric_observed_or_scheduled",
+                "explicit_decision_taken"
+            ]
+        },
+        "alerts": {
+            "work_item_age_threshold_days": 3
+        }
+    },
+    "metrics": {
+        "instrumentation": "ENABLED",
+        "status": "OPERATIONAL"
+    }
+}

@@ -1,0 +1,34 @@
+Smoke Test Procedure (Web Viewer)
+
+Prereqs:
+- Have at least one exported report file in REPORTS_DIR named <report_id>.json
+- Each report must match ReportEnvelope schema and include signature_sha256 of payload
+
+1) Install (dev)
+   pip install -e viewer[dev]
+
+2) Run tests
+   pytest -q viewer/tests
+
+3) Start server
+   set VIEWER_API_KEY=
+   set REPORTS_DIR=./exports
+   python -m uvicorn viewer.app:app --host 0.0.0.0 --port 8080
+
+4) Verify health
+   curl http://localhost:8080/health
+
+5) List reports
+   curl http://localhost:8080/reports?limit=50&offset=0
+
+6) Get report (verifies signature)
+   curl http://localhost:8080/reports/<report_id>
+
+7) Verify endpoint
+   curl http://localhost:8080/reports/<report_id>/verify
+
+Release Gate:
+- Viewer tests pass
+- Signature mismatch is rejected (400)
+- POST/PUT/DELETE are blocked (405)
+- health + list + get + verify succeed on sample exports

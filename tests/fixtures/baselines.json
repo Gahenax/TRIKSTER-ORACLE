@@ -1,0 +1,118 @@
+[
+  {
+    "name": "Strong Home Favorite",
+    "inputs": {
+      "event_key": "test_strong_home_favorite",
+      "risk_profile": "CONSERVATIVE",
+      "stake": 100.0,
+      "features": {
+        "rating_diff": 200.0,
+        "home_advantage": 100.0
+      },
+      "snapshot_id": "snap_str",
+      "snapshot_data": {
+        "meta": "Strong Home Favorite"
+      }
+    },
+    "expected_output": {
+      "pls": 0.2384,
+      "zone": "RED",
+      "fragility": 0.26168615100053716,
+      "tail_percentiles": {
+        "p5": -0.8024843704790271,
+        "p10": -0.6425010243600463,
+        "p25": -0.26720015884706
+      },
+      "n_sims": 10000,
+      "determinism_signature": "1e4d24e35ad5bc36db532f3e0211ac8916de99a9402193cf427e5c19daeef4f4",
+      "snapshot_id": "snap_str"
+    }
+  },
+  {
+    "name": "Weak Home Underdog",
+    "inputs": {
+      "event_key": "test_weak_home_underdog",
+      "risk_profile": "RISKY",
+      "stake": 100.0,
+      "features": {
+        "rating_diff": -250.0,
+        "home_advantage": 50.0
+      },
+      "snapshot_id": "snap_wea",
+      "snapshot_data": {
+        "meta": "Weak Home Underdog"
+      }
+    },
+    "expected_output": {
+      "pls": 0.4659,
+      "zone": "RED",
+      "fragility": 0.25773489876455985,
+      "tail_percentiles": {
+        "p5": -0.924105068629959,
+        "p10": -0.7969662907307615,
+        "p25": -0.5722334582069961
+      },
+      "n_sims": 10000,
+      "determinism_signature": "74a6d831d5ed23f6bcbc3094340de7a1f2ebf54ea4720db2eded75ca31acdcec",
+      "snapshot_id": "snap_wea"
+    }
+  },
+  {
+    "name": "Neutral Clash",
+    "inputs": {
+      "event_key": "test_neutral_clash",
+      "risk_profile": "NEUTRAL",
+      "stake": 100.0,
+      "features": {
+        "rating_diff": 0.0,
+        "home_advantage": 100.0
+      },
+      "snapshot_id": "snap_neu",
+      "snapshot_data": {
+        "meta": "Neutral Clash"
+      }
+    },
+    "expected_output": {
+      "pls": 0.3313,
+      "zone": "RED",
+      "fragility": 0.25980642544807475,
+      "tail_percentiles": {
+        "p5": -0.8696007619218494,
+        "p10": -0.7289526488535855,
+        "p25": -0.4503307514237408
+      },
+      "n_sims": 10000,
+      "determinism_signature": "2eb734ccc1b024b9b09ea5493016e23fbb4af80f86f356cdf0b51dbfacdc00a0",
+      "snapshot_id": "snap_neu"
+    }
+  },
+  {
+    "name": "Slight Away Favorite",
+    "inputs": {
+      "event_key": "test_slight_away_favorite",
+      "risk_profile": "NEUTRAL",
+      "stake": 100.0,
+      "features": {
+        "rating_diff": -50.0,
+        "home_advantage": 80.0
+      },
+      "snapshot_id": "snap_sli",
+      "snapshot_data": {
+        "meta": "Slight Away Favorite"
+      }
+    },
+    "expected_output": {
+      "pls": 0.3624,
+      "zone": "RED",
+      "fragility": 0.25883003867409254,
+      "tail_percentiles": {
+        "p5": -0.8838269276759028,
+        "p10": -0.7460572317101037,
+        "p25": -0.4855506069214077
+      },
+      "n_sims": 10000,
+      "determinism_signature": "8ca47e684cb8fb0c0a06d40a0fe19d9a7467bfb086c605505661a8597aa5a425",
+      "snapshot_id": "snap_sli"
+    }
+  }
+]

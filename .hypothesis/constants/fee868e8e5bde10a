@@ -1,0 +1,4 @@
+# file: C:\Users\USUARIO\.gemini\antigravity\playground\TRIKSTER-ORACLE\core\exporter.py
+# hypothesis_version: 6.151.6
+
+[4096, '%Y%m%d_%H%M%S', '0.0.0', 'app_version', 'bet', 'created_at', 'event_key', 'exports', 'files', 'hashes.json', 'manifest.json', 'opportunity', 'pack_id', 'pick', 'profit', 'rb', 'report.json', 'roi', 'unknown', 'utf-8', 'value', 'version', 'w', 'win']

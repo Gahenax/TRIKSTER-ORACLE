@@ -1,0 +1,13 @@
+{
+  "created_at": "2026-02-11T22:52:01.574904+00:00",
+  "status": "generated",
+  "plan_path": "_antigravity_out\\plan_go_live.json",
+  "outputs": [
+    "viewer\\middleware\\request_id.py",
+    "viewer\\middleware\\ratelimit.py",
+    "viewer\\logging_conf.py",
+    "viewer\\attestation.py",
+    "deploy\\nginx\\viewer.conf",
+    "_antigravity_out\\go_live_gate.py"
+  ]
+}

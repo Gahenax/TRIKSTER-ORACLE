@@ -1,0 +1,4 @@
+# file: C:\Users\USUARIO\.gemini\antigravity\playground\TRIKSTER-ORACLE\sim\scenario.py
+# hypothesis_version: 6.151.6
+
+[0.0, 1000, 10000, 'GREEN', 'fragility', 'n_sims', 'p10', 'p25', 'p5', 'pls', 'snapshot_id', 'tail_percentiles', 'zone']

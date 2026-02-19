@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report - {{ report.event_key[:8] }} | Trickster Companion</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --primary: #38bdf8;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: #334155;
+
+            --zone-green: #22c55e;
+            --zone-yellow: #eab308;
+            --zone-red: #ef4444;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .report-card {
+            width: 100%;
+            max-width: 900px;
+            background: var(--surface);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            margin: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-id {
+            font-family: monospace;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            background: var(--bg);
+            padding: 0.25rem 0.6rem;
+            border-radius: 0.5rem;
+        }
+
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-GREEN {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--zone-green);
+            border: 1px solid var(--zone-green);
+        }
+
+        .badge-YELLOW {
+            background: rgba(234, 179, 8, 0.1);
+            color: var(--zone-yellow);
+            border: 1px solid var(--zone-yellow);
+        }
+
+        .badge-RED {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--zone-red);
+            border: 1px solid var(--zone-red);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .metric-card {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .metric-label {
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            color: var(--text-dim);
+            border-bottom: 2px solid var(--border);
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .audit-panel {
+            background: #000;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #10b981;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        .audit-title {
+            color: var(--text-dim);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        /* Ad Slots Placeholder (W3.1) */
+        .ad-slot {
+            width: 100%;
+            max-width: 728px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.2);
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .nav-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    {% if config.ADS_ENABLED %}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8537336585034121"
+        crossorigin="anonymous"></script>
+    {% endif %}
+
+    <!-- Top Ad Slot (W3.1) -->
+    <div class="ad-slot">
+        {% if config.ADS_ENABLED %}
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8537336585034121"
+            data-ad-slot="9758043587" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script> (adsbygoogle = window.adsbygoogle || []).push({}); </script>
+        {% else %}
+        ADSENSE_TOP_BANNER
+        {% endif %}
+    </div>
+
+    <div class="report-card">
+        <header>
+            <div>
+                <h1>Risk Evaluation Report</h1>
+                <span class="event-id">ID: {{ report.event_key }}</span>
+            </div>
+            <div class="badge badge-{{ report.results.zone }}">
+                ZONE {{ report.results.zone }}
+            </div>
+        </header>
+
+        <div class="grid">
+            <div class="metric-card">
+                <div class="metric-label">Prob. Large Loss (PLS)</div>
+                <div class="metric-value">{{ (report.results.pls_percent * 100) | round(2) }}%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Fragility Indicator</div>
+                <div class="metric-value">{{ report.results.fragility | round(4) }}</div>
+            </div>
+        </div>
+
+        <div class="metric-label" style="margin-bottom: 1rem;">Tail Negative Distribution</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Percentile</th>
+                    {% for p in report.results.tail_percentiles.keys() %}
+                    <th>{{ p }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Potential Exposure</td>
+                    {% for v in report.results.tail_percentiles.values() %}
+                    <td>{{ (v * 100) | round(1) }}%</td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Sidebar/Internal Ad Slot (W3.1) -->
+        <div class="ad-slot" style="height: 60px; margin-bottom: 2rem; border-color: rgba(56, 189, 248, 0.2);">
+            ADSENSE_IN_FEED</div>
+
+        <div class="audit-title">Deterministic Integrity & Audit</div>
+        <div class="audit-panel">
+            <div>SIGNATURE: {{ report.audit.determinism_signature }}</div>
+            <div>TIMESTAMP: {{ report.audit.created_at_utc }}</div>
+            <div>SNAPSHOT : {{ report.snapshot_id }}</div>
+            <div>VERSION : {{ report.app_version }} / {{ report.policy_version }}</div>
+        </div>
+
+        <div style="margin-top: 3rem; text-align: center; border-top: 1px solid var(--border); padding-top: 2rem;">
+            <a href="/" class="nav-link">← Upload Another Report</a>
+        </div>
+    </div>
+
+    <!-- Footer Ad Slot (W3.1) -->
+    <div class="ad-slot">ADSENSE_FOOTER_UNIT</div>
+
+    <div style="color: var(--text-dim); font-size: 0.75rem; margin-bottom: 2rem; max-width: 600px; text-align: center;">
+        This report is for educational and analytical purposes only. It is a risk evaluation tool, not a recommendation
+        to engage in betting activities. No ROI or guaranteed outcomes are calculated.
+    </div>
+</body>
+
+</html>

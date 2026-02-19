@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Documentation | Trickster Companion{% endblock %}
+{% block content %}
+<h1>Risk Metrics Documentation</h1>
+
+<h2>Probability of Large Loss (PLS)</h2>
+<p>The PLS represents the mathematical probability that an outcome will result in a drawdown of 30% or more relative to
+    the input stake, based on 10,000 Monte Carlo simulations.</p>
+
+<h2>Risk Zones</h2>
+<ul>
+    <li><strong>GREEN</strong>: Scenarios with low quantified uncertainty (PLS < 10%).</li>
+    <li><strong>YELLOW</strong>: Scenarios with moderate variance (PLS 10% - 20%).</li>
+    <li><strong>RED</strong>: High fragmentation scenarios (PLS > 20%).</li>
+</ul>
+
+<h2>Deterministic Signatures</h2>
+<p>Every report includes a <code>determinism_signature</code>. This hash proves that the simulation was executed on the
+    desktop core without tampering, as it captures the exact state of all inputs at the moment of evaluation.</p>
+{% endblock %}

@@ -1,0 +1,4 @@
+# file: C:\Users\USUARIO\.gemini\antigravity\playground\TRIKSTER-ORACLE\core\db\models.py
+# hypothesis_version: 6.151.6
+
+[100, 'CONSERVATIVE', 'FINAL', 'LIVE', 'NEUTRAL', 'PREMATCH', 'RISKY', 'availability', 'entities', 'entities.id', 'event_profiles', 'events', 'events.event_key', 'leagues', 'leagues.id', 'ledger', 'snapshots', 'sports', 'sports.id', 'wallet']

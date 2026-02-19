@@ -1,0 +1,4 @@
+# file: C:\Users\USUARIO\.gemini\antigravity\playground\TRIKSTER-ORACLE\backend\app\sim_kernel\config.py
+# hypothesis_version: 6.151.6
+
+[500, 1337, 2000, 'FIFO', 'PRIORITY', 'ROUND_ROBIN', 'full', 'lite', 'standard']

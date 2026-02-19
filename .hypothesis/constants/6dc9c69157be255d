@@ -1,0 +1,4 @@
+# file: C:\Users\USUARIO\.gemini\antigravity\playground\TRIKSTER-ORACLE\core\lifecycle.py
+# hypothesis_version: 6.151.6
+
+['CREATED', 'FAIL', 'LIFECYCLE_ERROR', 'LOCKED', 'PROFILE_SET', 'SIMULATED', 'SNAPSHOT_TAKEN', 'STATE_TRANSITION', 'SUCCESS', 'attempted', 'current', 'error', 'from', 'system', 'to']

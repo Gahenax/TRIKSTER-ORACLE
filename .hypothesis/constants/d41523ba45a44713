@@ -1,0 +1,4 @@
+# file: C:\Users\USUARIO\.gemini\antigravity\playground\TRIKSTER-ORACLE\core\verify.py
+# hypothesis_version: 6.151.6
+
+['--suite', '__main__', 'expected_output', 'inputs', 'n_sims', 'name', 'pls', 'r', 'zone']

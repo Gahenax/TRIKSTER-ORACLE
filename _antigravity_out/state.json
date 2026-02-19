@@ -1,0 +1,13 @@
+{
+  "created_at": "2026-02-11T22:38:39.452714+00:00",
+  "status": "generated",
+  "plan_path": "_antigravity_out\\plan.json",
+  "manifest_path": "_antigravity_out\\artifact_manifest.json",
+  "notes": [
+    "Review viewer/app.py for integration with your actual exports/signing.",
+    "Ensure VIEWER_API_KEY is set in production.",
+    "Set REPORTS_DIR to your exports location."
+  ],
+  "tasks_count": 5,
+  "artifacts_count": 7
+}

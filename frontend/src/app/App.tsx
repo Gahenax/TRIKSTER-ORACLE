@@ -1,7 +1,8 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { api } from './lib/api';
-import type { SimulationResult, SimulationResultV2, EventInput } from './lib/types';
+import type { SimulationResult, SimulationResultV2, EventInput, UserStatus } from './lib/types';
 import FooterDisclaimer from './components/FooterDisclaimer';
+import TokenBadge from './components/TokenBadge';
 
 // Lazy load page components for better performance (code splitting)
 const Home = lazy(() => import('./pages/Home'));
@@ -10,8 +11,9 @@ const Simulator = lazy(() => import('./pages/Simulator'));
 const Result = lazy(() => import('./pages/Result'));
 const ResultV2 = lazy(() => import('./pages/ResultV2'));
 const Pricing = lazy(() => import('./pages/Pricing'));
+const Oracle = lazy(() => import('./pages/Oracle'));
 
-type Page = 'home' | 'boarding' | 'simulator' | 'result';
+type Page = 'home' | 'boarding' | 'simulator' | 'result' | 'oracle';
 
 function App() {
     const [currentPage, setCurrentPage] = useState<Page>('boarding');
@@ -19,8 +21,21 @@ function App() {
     const [simulationResult, setSimulationResult] = useState<SimulationResult | SimulationResultV2 | null>(null);
     const [lastEvent, setLastEvent] = useState<EventInput | null>(null);
     const [isBackendHealthy, setIsBackendHealthy] = useState<boolean | null>(null);
-    const [userStatus, setUserStatus] = useState<any>(null); // Simplified for now
+    const [userStatus, setUserStatus] = useState<UserStatus | null>(null);
     const [userId] = useState<string>(`user_${Math.random().toString(36).substr(2, 9)}`);
+
+    // Refresh token balance from server
+    const refreshTokens = useCallback(async () => {
+        try {
+            const balanceData = await api.getTokenBalance(userId);
+            setUserStatus((prev) => {
+                if (!prev) return prev;
+                return { ...prev, token_balance: balanceData.balance };
+            });
+        } catch {
+            // Silently fail — badge will show stale data
+        }
+    }, [userId]);
 
     useEffect(() => {
         // Check backend health on mount
@@ -41,6 +56,9 @@ function App() {
             setUserStatus((result as SimulationResultV2).user_status);
         }
 
+        // Refresh token balance after simulation
+        refreshTokens();
+
         setCurrentPage('result');
     };
 
@@ -55,6 +73,10 @@ function App() {
 
     const handleNavigatePricing = () => {
         setCurrentPage('pricing' as any);
+    };
+
+    const handleNavigateOracle = () => {
+        setCurrentPage('oracle');
     };
 
     return (
@@ -106,34 +128,46 @@ function App() {
                                 >
                                     Simulator
                                 </button>
+                                <button
+                                    onClick={handleNavigateOracle}
+                                    className="btn btn-secondary btn-sm"
+                                    style={{ border: '1px solid var(--color-accent-primary)', color: 'var(--color-accent-primary)' }}
+                                >
+                                    Oracle
+                                </button>
                             </nav>
                         </div>
 
-                        {/* Backend Status Indicator */}
+                        {/* Backend Status + Token Badge */}
                         {isBackendHealthy !== null && (
                             <div style={{
                                 marginTop: 'var(--space-sm)',
-                                fontSize: 'var(--font-size-xs)',
-                                color: 'var(--color-text-muted)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 'var(--space-sm)'
                             }}>
                                 <div style={{
-                                    width: '8px',
-                                    height: '8px',
-                                    borderRadius: '50%',
-                                    background: isBackendHealthy ? 'var(--color-accent-success)' : 'var(--color-accent-warning)'
-                                }} />
-                                {isBackendHealthy ? 'Backend Connected' : 'Backend Offline (Using Mock Data)'}
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 'var(--space-sm)',
+                                    fontSize: 'var(--font-size-xs)',
+                                    color: 'var(--color-text-muted)',
+                                }}>
+                                    <div style={{
+                                        width: '8px',
+                                        height: '8px',
+                                        borderRadius: '50%',
+                                        background: isBackendHealthy ? 'var(--color-accent-success)' : 'var(--color-accent-warning)'
+                                    }} />
+                                    {isBackendHealthy ? 'Backend Connected' : 'Backend Offline (Using Mock Data)'}
+                                </div>
 
-                                {userStatus && (
-                                    <span style={{ marginLeft: 'auto', display: 'flex', gap: 'var(--space-md)' }}>
-                                        <span>Tokens: <strong>{userStatus.token_balance}</strong></span>
-                                        <span>Daily: <strong>{userStatus.daily_used} / {userStatus.daily_limit}</strong></span>
-                                        {userStatus.is_premium && <span className="badge badge-premium">PREMIUM</span>}
-                                    </span>
-                                )}
+                                <span style={{ marginLeft: 'auto' }}>
+                                    <TokenBadge
+                                        userStatus={userStatus}
+                                        onRefresh={refreshTokens}
+                                    />
+                                </span>
                             </div>
                         )}
                     </div>
@@ -172,6 +206,9 @@ function App() {
                     )}
                     {currentPage === 'home' && (
                         <Home onNavigateSimulator={handleNavigateSimulator} />
+                    )}
+                    {currentPage === 'oracle' && (
+                        <Oracle />
                     )}
                     {currentPage === 'simulator' && (
                         <Simulator

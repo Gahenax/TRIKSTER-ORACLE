@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  web-viewer:
+    build:
+      context: ..
+      dockerfile: Dockerfile.viewer
+    container_name: web-viewer
+    environment:
+      - REPORTS_DIR=/exports
+      - VIEWER_API_KEY=${VIEWER_API_KEY}
+      - VIEWER_RPS=${VIEWER_RPS:-5}
+      - VIEWER_BURST=${VIEWER_BURST:-20}
+      - VIEWER_VERSION=${VIEWER_VERSION:-0.1.0}
+      - GIT_SHA=${GIT_SHA:-unknown}
+    volumes:
+      # Mount exports as read-only
+      - ${HOST_EXPORTS_DIR}:/exports:ro
+    ports:
+      # Bind internally; prefer Nginx reverse proxy for public exposure
+      - "127.0.0.1:${VIEWER_PORT:-8080}:8080"
+    restart: unless-stopped

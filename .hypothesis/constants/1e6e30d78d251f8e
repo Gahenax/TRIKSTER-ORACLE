@@ -1,0 +1,4 @@
+# file: C:\Users\USUARIO\.gemini\antigravity\playground\TRIKSTER-ORACLE\features\basketball_features.py
+# hypothesis_version: 6.151.6
+
+[20.0, 150.0, 1500.0, 'away_rating', 'away_rest_days', 'home_advantage', 'home_rating', 'home_rest_days', 'rating_diff', 'rest_impact']

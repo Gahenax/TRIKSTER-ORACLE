@@ -1,6 +1,7 @@
 /**
  * API Client for Trickster Oracle Backend
  * Handles all HTTP communication with the FastAPI backend
+ * Uses DNS-safe apiFetch with primary/fallback failover
  */
 
 import type {
@@ -13,15 +14,14 @@ import type {
     ErrorResponse,
     UserStatus,
 } from './types';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+import { apiFetch } from './apiClient';
 
 class TricksterAPI {
     async checkHealth(): Promise<HealthResponse> {
-        const response = await fetch(`${API_BASE_URL}/v2/health`);
+        const response = await apiFetch('/api/v2/health');
         if (!response.ok) {
             // Fallback to v1 health if v2 is not yet deployed
-            const v1Response = await fetch(`${API_BASE_URL}/health`);
+            const v1Response = await apiFetch('/health');
             if (!v1Response.ok) throw new Error('Backend health check failed');
             return v1Response.json();
         }
@@ -29,7 +29,7 @@ class TricksterAPI {
     }
 
     async getVersion(): Promise<VersionResponse> {
-        const response = await fetch(`${API_BASE_URL}/version`);
+        const response = await apiFetch('/version');
         if (!response.ok) {
             throw new Error('Failed to fetch API version');
         }
@@ -37,7 +37,7 @@ class TricksterAPI {
     }
 
     async getUserStatus(userId: string): Promise<UserStatus> {
-        const response = await fetch(`${API_BASE_URL}/v2/me/status`, {
+        const response = await apiFetch('/api/v2/me/status', {
             headers: {
                 'X-User-ID': userId
             }
@@ -58,6 +58,26 @@ class TricksterAPI {
     }
 
     /**
+     * Fetch token balance from /api/v2/tokens/balance
+     */
+    async getTokenBalance(userId: string): Promise<{ user_id: string; balance: number; last_updated: string }> {
+        const response = await apiFetch('/api/v2/tokens/balance', {
+            headers: {
+                'X-User-ID': userId
+            }
+        });
+        if (!response.ok) {
+            // Graceful fallback: return zero balance on error
+            return {
+                user_id: userId,
+                balance: 0,
+                last_updated: new Date().toISOString()
+            };
+        }
+        return response.json();
+    }
+
+    /**
      * Simulation V2 - Depth-based Analytics
      */
     async simulateV2(
@@ -66,12 +86,12 @@ class TricksterAPI {
         depth: string = 'full_distribution',
         userId: string = 'demo_user'
     ): Promise<SimulationResultV2> {
-        const response = await fetch(`${API_BASE_URL}/v2/simulate`, {
+        const response = await apiFetch('/api/v2/simulate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-User-ID': userId,
-                'X-Idempotency-Key': `req_${Date.now()}`
+                'X-Idempotency-Key': crypto.randomUUID(),
             },
             body: JSON.stringify({
                 ...event,
@@ -103,7 +123,7 @@ class TricksterAPI {
         event: EventInput,
         config: SimulationConfig
     ): Promise<SimulationResult> {
-        const response = await fetch(`${API_BASE_URL}/v1/simulate`, {
+        const response = await apiFetch('/api/v1/simulate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -190,6 +210,7 @@ class TricksterAPI {
 
         return mockResult;
     }
+
     // Mock simulation for development v2
     async simulateMockV2(
         event: EventInput,

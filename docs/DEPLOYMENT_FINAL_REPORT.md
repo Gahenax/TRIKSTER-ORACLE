@@ -72,6 +72,11 @@ https://trickster-api.gahenaxaisolutions.com
 |------|------|-----------|-----|
 | CNAME | `trickster-api` | `trickster-oracle-api.onrender.com` | 14400 |
 
+### Frontend Static Hosting (Hostinger FTP)
+| Host | User | Target Dir | Status |
+|------|------|------------|--------|
+| `212.1.209.105` | `u314799704` | `public_html/` | ⏳ Pending Password |
+
 ---
 
 ## ✅ Validation Results

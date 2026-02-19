@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "name": "Web Viewer Deployment Plan",
+    "created_at": "2026-02-11T22:38:39.440176+00:00",
+    "repo_root": "C:\\Users\\USUARIO\\.gemini\\antigravity\\playground\\TRIKSTER-ORACLE",
+    "non_negotiables": [
+      "Viewer is a separate service",
+      "Read-only; never writes ledger",
+      "Verify SHA-256 signature before render/return",
+      "Reject malformed payloads with 422",
+      "CI gate: lint + tests"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "WV-00",
+      "title": "Create Web Viewer service scaffold",
+      "summary": "Create separate FastAPI service under viewer/ with strict read-only endpoints and signature verification.",
+      "outputs": [
+        "viewer\\app.py",
+        "viewer\\pyproject.toml",
+        "viewer\\tests\\test_viewer.py"
+      ],
+      "dod": [
+        "viewer/app.py exists and runs locally",
+        "Endpoints: /health, /reports, /reports/{id}, /raw, /verify implemented",
+        "POST/PUT/DELETE blocked with 405",
+        "Signature verified before any payload is returned"
+      ],
+      "commands": [
+        "python -c \"print('Scaffold generation is file-based; see generated files under viewer/')\""
+      ],
+      "gates": [
+        {
+          "name": "viewer unit tests",
+          "command": "pytest -q viewer/tests",
+          "required": true
+        }
+      ],
+      "rollback": [
+        "git checkout -- viewer/",
+        "git clean -fd viewer/"
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "WV-01",
+      "title": "Add minimal security headers and API key auth",
+      "summary": "Add baseline security headers and header-based API key guard (prod enforced).",
+      "outputs": [
+        "viewer\\app.py"
+      ],
+      "dod": [
+        "Requests without X-API-Key rejected when VIEWER_API_KEY is set",
+        "Headers present: nosniff, deny framing, no-referrer, no-store cache"
+      ],
+      "commands": [
+        "python -c \"print('Auth/headers implemented in viewer/app.py')\""
+      ],
+      "gates": [
+        {
+          "name": "viewer unit tests",
+          "command": "pytest -q viewer/tests",
+          "required": true
+        }
+      ],
+      "rollback": [
+        "git checkout -- viewer/app.py"
+      ],
+      "depends_on": [
+        "WV-00"
+      ]
+    },
+    {
+      "id": "WV-02",
+      "title": "Add CI workflow for Viewer",
+      "summary": "Add GitHub Actions workflow to lint and test viewer service.",
+      "outputs": [
+        ".github\\workflows\\web-viewer-ci.yml"
+      ],
+      "dod": [
+        "CI runs on push/PR touching viewer/",
+        "CI executes ruff + pytest successfully"
+      ],
+      "commands": [
+        "python -c \"print('CI file generated under .github/workflows/web-viewer-ci.yml')\""
+      ],
+      "gates": [
+        {
+          "name": "local viewer unit tests",
+          "command": "pytest -q viewer/tests",
+          "required": true
+        }
+      ],
+      "rollback": [
+        "git checkout -- .github/workflows/web-viewer-ci.yml"
+      ],
+      "depends_on": [
+        "WV-00"
+      ]
+    },
+    {
+      "id": "WV-03",
+      "title": "Containerize Viewer",
+      "summary": "Create Dockerfile for viewer service to deploy consistently.",
+      "outputs": [
+        "Dockerfile.viewer"
+      ],
+      "dod": [
+        "docker build succeeds",
+        "docker run exposes /health"
+      ],
+      "commands": [
+        "docker build -f Dockerfile.viewer -t web-viewer:local .",
+        "docker run --rm -p 8080:8080 -e VIEWER_API_KEY='' web-viewer:local"
+      ],
+      "gates": [
+        {
+          "name": "viewer unit tests",
+          "command": "pytest -q viewer/tests",
+          "required": true
+        }
+      ],
+      "rollback": [
+        "git checkout -- Dockerfile.viewer"
+      ],
+      "depends_on": [
+        "WV-00"
+      ]
+    },
+    {
+      "id": "WV-04",
+      "title": "Smoke test and release gate",
+      "summary": "Add a minimal smoke procedure: start viewer, list reports, verify signatures on sample exports.",
+      "outputs": [
+        "_antigravity_out\\smoke_instructions.txt"
+      ],
+      "dod": [
+        "Smoke instructions exist and are executable",
+        "Gate: tests pass + smoke steps succeed"
+      ],
+      "commands": [
+        "python _antigravity_out/run_smoke.py"
+      ],
+      "gates": [
+        {
+          "name": "viewer unit tests",
+          "command": "pytest -q viewer/tests",
+          "required": true
+        }
+      ],
+      "rollback": [
+        "rm -rf _antigravity_out"
+      ],
+      "depends_on": [
+        "WV-00",
+        "WV-03"
+      ]
+    }
+  ]
+}

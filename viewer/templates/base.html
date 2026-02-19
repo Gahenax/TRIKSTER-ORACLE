@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Trickster Companion{% endblock %}</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --primary: #38bdf8;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 3rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .content-card {
+            width: 100%;
+            max-width: 800px;
+            background: var(--surface);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            border: 1px solid var(--border);
+            line-height: 1.6;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            margin-top: 0;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--primary);
+            margin-top: 2.5rem;
+        }
+
+        .back-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            display: inline-block;
+        }
+
+        .back-link:hover {
+            color: var(--text-main);
+        }
+
+        footer {
+            margin-top: 3rem;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="width: 100%; max-width: 800px;">
+        <a href="/" class="back-link">← Event Viewer</a>
+    </div>
+    <div class="content-card">
+        {% block content %}{% endblock %}
+    </div>
+    <footer>
+        &copy; 2026 Trickster Oracle Companion. Deterministic Risk Excellence.
+    </footer>
+</body>
+
+</html>

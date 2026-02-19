@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trickster Oracle — Probabilistic Analytics Module</title>
+    <link rel="stylesheet" href="./assets/app.css">
+</head>
+<body>
+    <div class="glow-bg"></div>
+    
+    <div class="container">
+        <header>
+            <div class="badge">TRICKSTER ORACLE V2.1</div>
+            <h1>Simulación Probabilística</h1>
+            <p class="subtitle">Motor analítico educativo para el estudio de distribuciones de probabilidad y escenarios de riesgo deportivo mediante Monte Carlo.</p>
+            
+            <div class="status-bar">
+                <div class="status-item">
+                    <div id="api-indicator" class="indicator"></div>
+                    Motor Engine (Render API)
+                </div>
+                <div class="status-item">
+                    <div class="indicator online"></div>
+                    Static Frontend (Hostinger)
+                </div>
+            </div>
+        </header>
+
+        <main class="deck">
+            <!-- INPUT CARD -->
+            <section class="card">
+                <h3 class="card-title">📊 Configuración de Escenario</h3>
+                <form id="demo-form">
+                    <div class="input-group">
+                        <label for="sim-count">Iteraciones (Simulaciones)</label>
+                        <input type="number" id="sim-count" value="1000" min="100" max="10000">
+                    </div>
+                    <div class="input-group">
+                        <label for="prob-a">Probabilidad Equipo A (0.0 - 1.0)</label>
+                        <input type="number" id="prob-a" value="0.55" step="0.01" min="0" max="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="prob-b">Probabilidad Equipo B (0.0 - 1.0)</label>
+                        <input type="number" id="prob-b" value="0.45" step="0.01" min="0" max="1">
+                    </div>
+                    <button type="submit" id="run-btn">Ejecutar Simulación</button>
+                </form>
+            </section>
+
+            <!-- OUTPUT CARD -->
+            <section class="card">
+                <h3 class="card-title">🔍 Resultados del Oráculo</h3>
+                <div class="output-container" id="response-output">
+                    <p style="color: #555;">Esperando parámetros para iniciar cálculo...</p>
+                </div>
+            </section>
+        </main>
+
+        <nav class="nav-links">
+            <a href="https://trickster-oracle-api.onrender.com/docs" target="_blank">Documentación API</a>
+            <a href="https://trickster-oracle-api.onrender.com/health" target="_blank">Health Check</a>
+            <a href="https://gahenaxaisolutions.com" target="_blank">Gahenax AI Solutions</a>
+        </nav>
+
+        <footer class="footer-note">
+            Este software es una herramienta estrictamente educativa y de análisis estadístico. No fomenta, facilita ni procesa apuestas reales. El uso de modelos probabilísticos es para fines informativos y de comprensión del riesgo matemático.
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./config.js"></script>
+    <script src="./assets/app.js"></script>
+</body>
+</html>

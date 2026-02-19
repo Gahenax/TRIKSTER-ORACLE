@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Trisckter Oracle v2.1 — El motor de análisis probabilístico más avanzado para simulaciones deportivas.">
+
+    <title>Trickster Oracle | Premium Probabilistic Analytics</title>
+
+    <!-- Phase 5: Assets Loading -->
+    <link rel="stylesheet" href="./assets/app.css">
+</head>
+
+<body>
+    <!-- Background aura effect -->
+    <div class="aura"></div>
+
+    <div class="app-wrapper">
+        <!-- Hero Section -->
+        <header class="fade-in">
+            <div class="badge">Experimental Engine — V2.1 Operational</div>
+            <h1>Trickster Oracle</h1>
+            <p class="hero-sub">
+                Motor de análisis probabilístico de alto rendimiento. Utilizamos algoritmos de Monte Carlo para modelar
+                incertidumbre y predecir distribuciones de resultados en eventos deportivos complejos.
+            </p>
+
+            <!-- Phase 4: Status Indicator -->
+            <div class="system-status">
+                <div class="status-check">
+                    <div id="engine-dot" class="dot"></div>
+                    <span id="engine-status-text">Handshaking with Render Engine...</span>
+                </div>
+                <div class="status-check">
+                    <div class="dot active"></div>
+                    <span>Gahenax Static Distribution Live</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Analytics Desk -->
+        <main class="analytics-grid fade-in delay-1" id="demo">
+            <!-- Phase 5: Inputs Section -->
+            <section class="glass-card">
+                <div class="card-header">
+                    <i>⚙️</i>
+                    <h3>Configuración de Parámetros</h3>
+                </div>
+
+                <form id="simulation-form">
+                    <div class="control-group">
+                        <label for="sport">Deporte</label>
+                        <div class="input-wrapper">
+                            <select id="sport">
+                                <option value="FOOTBALL" selected>Fútbol</option>
+                                <option value="UFC">UFC</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="actorA">Actor A (Equipo / Peleador)</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="actorA" placeholder="Ej. Real Madrid" required>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="actorB">Actor B (Oponente)</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="actorB" placeholder="Ej. Barcelona" required>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="mode">Modo de Análisis</label>
+                        <div class="input-wrapper">
+                            <select id="mode">
+                                <option value="FAST" selected>FAST (Rápido)</option>
+                                <option value="ORACLE">ORACLE (Profundo)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <details class="advanced-settings">
+                        <summary>Configuración Avanzada</summary>
+                        <div class="control-group">
+                            <label for="iterations">Iteraciones (Simulaciones)</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="iterations" value="1000" min="100" max="10000" step="100">
+                            </div>
+                        </div>
+                    </details>
+
+                    <button type="submit" class="cta-button" id="run-simulation">
+                        <span>Ejecutar Oráculo</span>
+                        <i>⚡</i>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Result Section -->
+            <section class="glass-card glow-card">
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dot" style="background: #ff5f56;"></div>
+                        <div class="terminal-dot" style="background: #ffbd2e;"></div>
+                        <div class="terminal-dot" style="background: #27c93f;"></div>
+                        <span
+                            style="font-size: 0.7rem; color: #555; margin-left: 10px; font-weight: 700;">ORACLE_TERMINAL_OUTPUT</span>
+                    </div>
+                    <div class="terminal-body" id="json-output">
+                        <div class="placeholder-text">
+                            Configure los parámetros del escenario<br>para visualizar el flujo de salida probabilístico.
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Navigation Anchors -->
+        <nav class="footer-nav fade-in delay-2">
+            <a href="https://trickster-oracle-api.onrender.com/docs" target="_blank">Documentación API</a>
+            <a href="https://trickster-oracle-api.onrender.com/health" target="_blank">Salud del Motor</a>
+            <a href="#demo">Ir al Simulador</a>
+            <a href="https://gahenaxaisolutions.com" target="_blank">Volver a Gahenax</a>
+        </nav>
+
+        <!-- Phase 5: Compliance Note -->
+        <footer class="legal-notice fade-in delay-3">
+            <p><strong>Aviso Importante:</strong> Esta es una herramienta estrictamente educativa y analítica diseñada
+                para el estudio de la probabilidad y la estadística. Trickster Oracle no es una plataforma de apuestas,
+                no facilita transacciones financieras ni fomenta el juego. El análisis proporcionado se basa en
+                simulaciones matemáticas Monte Carlo para fines informativos.</p>
+            <p>&copy; 2026 Gahenax AI Solutions. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    <!-- Phase 5: Scripts Injection -->
+    <script src="./config.js"></script>
+    <script src="./assets/app.js"></script>
+</body>
+
+</html>

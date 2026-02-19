@@ -26,7 +26,7 @@ from app.core.distribution import (
     compute_percentiles,
     compute_distribution_stats
 )
-
+from app.core.spectral import analyze_mc_spectral_quality
 
 def simulate_event_v2(
     event, 
@@ -82,11 +82,17 @@ def simulate_event_v2(
     
     raw_values = _generate_distribution_values(event, config, SCENARIO_DEFINITIONS["base"])
     
+    # Next Level: Spectral Synchronization with Riemann Zeros
+    from app.core.spectral import inject_zeta_entropy
+    raw_values = inject_zeta_entropy(raw_values)
+    
     # Compute statistical moments
     stats_dict = compute_distribution_stats(raw_values)
     percentiles_overall = compute_percentiles(raw_values)
     
     execution_time = (time.time() - start_time) * 1000
+    # Spectral Calibration (New Improvement)
+    spectral_report = analyze_mc_spectral_quality(raw_values)
     
     # Build complete DistributionObject
     distribution_obj = DistributionObject(
@@ -106,7 +112,8 @@ def simulate_event_v2(
         notes=(
             f"Monte Carlo simulation with {config.n_simulations} iterations. "
             f"ELO-based logistic model. Home advantage: {event.home_advantage}. "
-            f"Scenarios vary scale and variance to show range of outcomes."
+            f"Scenarios vary scale and variance to show range of outcomes. "
+            f"Spectral Calibration: r-mean={spectral_report['r_mean']:.4f} ({spectral_report['spectral_regime']})"
         ),
         execution_time_ms=execution_time
     )

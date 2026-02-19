@@ -1,0 +1,4 @@
+# file: C:\Users\USUARIO\.gemini\antigravity\playground\TRIKSTER-ORACLE\backend\app\sim_kernel\actions\emit.py
+# hypothesis_version: 6.151.6
+
+['_journal', '_run_id', 'degrade_reason', 'degraded', 'documents', 'emit', 'meta', 'ok', 'response', 'response_mapper', 'run_id', 'warnings']

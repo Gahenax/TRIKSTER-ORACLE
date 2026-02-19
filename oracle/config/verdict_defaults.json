@@ -1,0 +1,11 @@
+{
+    "ci_level": 0.99,
+    "edge_min_fast": 0.015,
+    "edge_min_oracle": 0.030,
+    "max_variance": 0.65,
+    "max_multimodality": 2,
+    "min_samples_fast": 300,
+    "min_samples_oracle": 1500,
+    "max_compute_ms_fast": 1500,
+    "max_compute_ms_oracle": 20000
+}

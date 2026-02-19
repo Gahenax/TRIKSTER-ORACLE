@@ -42,9 +42,9 @@ Este es un **laboratorio educativo**, no una bola de cristal.
 
 ---
 
-## 📊 Demo Scope (Versión 1.0)
+## 📊 Demo Scope (Versión 0.2.0-beta)
 
-### Alcance Inicial
+### Alcance
 - **Deporte**: Fútbol (Soccer)
 - **Mercado**: Match Winner (Home/Draw/Away)
 - **Modelo**: ELO Rating System simplificado
@@ -56,75 +56,55 @@ Este es un **laboratorio educativo**, no una bola de cristal.
 - ⚠️ Modelo básico (no considera lesiones, clima, motivación, etc.)
 - ⚠️ Sin integración en tiempo real
 - ⚠️ Sin tracking de precisión histórica del modelo
-- ⚠️ Máximo 5 simulaciones diarias (demo gratuito)
+- ⚠️ Límite diario de simulaciones (demo gratuito)
 
 ---
 
-## 🏗️ Arquitectura Técnica
+## 🏗️ Arquitectura Técnica (Versión 0.3.0 - Grado Auditoría)
 
-```
-Backend:  Python 3.11+ | FastAPI | NumPy
-Engine:   Monte Carlo Simulation (deterministic with seed)
-Frontend: Vite + React + TypeScript
-Charts:   Chart.js / Recharts
-Cache:    In-memory (demo) → Redis (producción)
-```
+El sistema utiliza una **Arquitectura Dual** para garantizar la máxima integridad del motor matemático mientras permite una visualización web segura y monetizada.
 
-### Componentes Clave
-1. **Core Engine** (`backend/app/core/engine.py`): Motor de simulación Monte Carlo
-2. **Risk Module** (`backend/app/core/risk.py`): Cálculo de volatilidad y bandas de riesgo
-3. **Explainer** (`backend/app/core/explain.py`): Generación de narrativas interpretables
-4. **API** (`backend/app/api/routes.py`): Endpoints REST con validación estricta
-5. **UI** (`frontend/src/`): Interfaz responsiva con visualizaciones interactivas
+### 1. Núcleo de Ejecución (Offline/Backend)
+- **Engine**: Simulación Monte Carlo determinista (SHA-256 signatures).
+- **Ledger L0**: Sistema *fail-closed* que registra cada simulación en un ledger inmutable antes de la ejecución.
+- **Vocabulary Guard**: Escáner automático que bloquea exportaciones con lenguaje de apuestas.
+- **Export Packs**: Generación de paquetes firmados (`report.json` + `manifest.json`) para verificación cruzada.
+
+### 2. Web Companion Viewer (Cloud/Service)
+- **FastAPI + Jinja2**: Visor de solo lectura diseñado para la interacción del usuario final.
+- **Hardening G0**: 
+  - **Rate Limiting**: 5 RPS / 20 Burst (Token Bucket).
+  - **Traceability**: X-Request-ID propagation y Access Logs estructurados (JSON).
+  - **Security**: CSP, HSTS ready, y firmas de integridad SHA-256 obligatorias.
+- **Monetización**: Integración nativa con AdSense (Publisher: `ca-pub-8537336585034121`).
 
 ---
 
-## 🚀 Roadmap
+## 🚀 Despliegue de Producción
 
-Ver [ROADMAP.py](./ROADMAP.py) para el plan de ejecución completo por fases.
+Para desplegar el visor en un entorno de producción (Docker), utiliza el pack de despliegue generado:
 
-**Fases**:
-- ✅ **FASE 0**: Fundaciones (identidad, alcance, scaffolding)
-- ⏳ **FASE 1**: Núcleo Analítico (Monte Carlo + Risk)
-- ⏳ **FASE 2**: Interpretación & Explicabilidad
-- ⏳ **FASE 3**: API lista para demo
-- ⏳ **FASE 4**: UI Demo
-- ⏳ **FASE 5**: Tokens + Control de uso
-- ⏳ **FASE 6**: Escalabilidad
+1. **Instalar Dependencias**: `pip install -e viewer[dev]`
+2. **Configurar**: `cp deploy/PROD_ENV.template deploy/.env` (Edita las claves API y rutas).
+3. **Ejecutar**: `python antigravity_execute_production.py`
+
+El script realizará un despliegue automático con verificación de "Go-Live Gate".
 
 ---
 
 ## 📖 Glosario & Terminología
 
 Ver [GLOSSARY.md](./GLOSSARY.md) para la lista completa de términos permitidos y prohibidos.
-
-**Principio**: Usamos lenguaje **analítico y educativo**, no lenguaje de apuestas.
+**Principio**: Usamos lenguaje **analítico y educativo**, no lenguaje de apuestas. Toda la data web es **determinista y auditable**.
 
 ---
 
 ## ⚖️ Disclaimer Legal
 
-Este software se proporciona "tal cual" sin garantías de ningún tipo. El uso de TRICKSTER-ORACLE es bajo tu propio riesgo. Los creadores no se responsabilizan por:
-- Pérdidas financieras derivadas del uso de este sistema
-- Decisiones tomadas basándose en los análisis generados
-- Exactitud de las probabilidades calculadas
-
-**Si decides usar información de este sistema para apuestas, hazlo bajo tu total responsabilidad y cumpliendo las leyes de tu jurisdicción.**
+Este software se proporciona "tal cual" sin garantías de ningún tipo. El uso de TRICKSTER-ORACLE es bajo tu propio riesgo.
 
 ---
 
-## 📝 Licencia
-
-MIT License - Ver [LICENSE](./LICENSE) para más detalles.
-
----
-
-## 🙏 Contribuciones
-
-Este es un proyecto educativo. Las contribuciones son bienvenidas siguiendo las [guías de contribución](./CONTRIBUTING.md).
-
----
-
-**Versión**: 0.1.0-alpha (Demo)  
-**Última actualización**: Febrero 2026  
+**Versión**: 0.3.0-stable (Production Ready)  
+**Última actualización**: 11 Febrero 2026  
 **Mantenido por**: [Gahenax](https://github.com/Gahenax)

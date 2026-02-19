@@ -1,0 +1,23 @@
+{
+    "epic": "TRICKSTER ORACLE MVP (FOOTBALL + UFC)",
+    "contract_version": "oracle.v1",
+    "one_chart_policy": true,
+    "no_value_text_only": true,
+    "dual_mode": true,
+    "modules_added": [
+        "oracle/pipeline.py",
+        "oracle/verdict_engine.py",
+        "oracle/language_guard.py",
+        "oracle/simulate.py",
+        "oracle/chart.py",
+        "oracle/data/interfaces.py",
+        "oracle/data/adapters.py",
+        "oracle/telemetry.py",
+        "oracle/contracts/oracle_v1.json",
+        "oracle/contracts/chart_policy.json",
+        "oracle/contracts/text_template_v1.json"
+    ],
+    "endpoint": "/api/oracle/evaluate",
+    "ui_route": "/oracle",
+    "tests": "4 tests passed in 0.091s"
+}

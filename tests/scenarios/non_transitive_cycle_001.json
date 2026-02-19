@@ -1,0 +1,6 @@
+{
+  "id": "non_transitive_cycle_001",
+  "request": {"fighter_a": "A", "fighter_b": "B"},
+  "config": {"scheduler": "FIFO", "seed": 7, "depth": "standard"},
+  "assert": {"warnings_contains": ["non_transitive_cycle_detected"]}
+}

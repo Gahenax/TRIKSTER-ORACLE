@@ -1,0 +1,19 @@
+# Production Environment Template for Web Viewer
+# Fill values and save as deploy/.env on the server.
+
+# Directory on the host containing exported report packs (*.json)
+HOST_EXPORTS_DIR=/srv/exports
+
+# Viewer secret for X-API-Key auth (min 32 chars recommended)
+VIEWER_API_KEY=CHANGE_ME_LONG_SECRET
+
+# Local bind port for the container (Nginx proxies to this)
+VIEWER_PORT=8080
+
+# Rate limit (server-side second line; edge limiting also recommended)
+VIEWER_RPS=5
+VIEWER_BURST=20
+
+# Traceability
+VIEWER_VERSION=0.1.0
+GIT_SHA=prod
